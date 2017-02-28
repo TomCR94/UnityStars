@@ -1,11 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PlanetKnowledge : AbstractStarsObject {
 
     
-    private long planetId;
+    private string planetId;
 
     /**
      * The mineral concentration of this planet
@@ -108,12 +109,12 @@ public class PlanetKnowledge : AbstractStarsObject {
         this.reportYear = reportYear;
     }
 
-    public void setPlanetId(long planetId)
+    public void setPlanetId(string planetId)
     {
         this.planetId = planetId;
     }
 
-    public long getPlanetId()
+    public string getPlanetId()
     {
         return planetId;
     }

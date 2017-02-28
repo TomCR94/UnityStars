@@ -33,11 +33,16 @@ public class Game : AbstractStarsObject {
     [SerializeField]
     private List<Player> players = new List<Player>();
 
-    [SerializeField]
+    //Dont serialize these lists
     private List<Planet> planets = new List<Planet>();
+    private List<Fleet> fleets = new List<Fleet>();
+
+    //Serialize references to their IDs instead    
+    [SerializeField]
+    private List<string> planetIDs = new List<string>();
 
     [SerializeField]
-    private List<Fleet> fleets = new List<Fleet>();
+    private List<string> fleetIDs = new List<string>();
 
     public static Game instance;
 
@@ -58,6 +63,8 @@ public class Game : AbstractStarsObject {
     private void Start()
     {
         instance = this;
+        for (int i = 0; i < transform.childCount; i++)
+            addPlayers(transform.GetChild(i).GetComponent<Player>());
     }
 
     override public void prePersist()
@@ -77,9 +84,9 @@ public class Game : AbstractStarsObject {
         return players;
     }
 
-    public void setPlayers(List<Player> players)
+    public void addPlayers(Player player)
     {
-        this.players = players;
+        this.players.Add(player);
     }
 
     public string getName()
@@ -127,9 +134,16 @@ public class Game : AbstractStarsObject {
         return planets;
     }
 
-    public void setPlanets(List<Planet> planets)
+    public void addPlanet(Planet planet)
     {
-        this.planets = planets;
+        this.planets.Add(planet);
+        this.planetIDs.Add(planet.getID());
+    }
+
+    public void removePlanet(Planet planet)
+    {
+        this.planets.Remove(planet);
+        this.planetIDs.Remove(planet.getID());
     }
 
     public List<Fleet> getFleets()
@@ -137,9 +151,16 @@ public class Game : AbstractStarsObject {
         return fleets;
     }
 
-    public void setFleets(List<Fleet> fleets)
+    public void addFleet(Fleet fleet)
     {
-        this.fleets = fleets;
+        this.fleets.Add(fleet);
+        this.fleetIDs.Add(fleet.getID());
+    }
+
+    public void removeFleet(Fleet fleet)
+    {
+        this.fleets.Remove(fleet);
+        this.fleetIDs.Remove(fleet.getID());
     }
 
     public void setYear(int year)

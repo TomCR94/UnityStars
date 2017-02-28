@@ -1,23 +1,28 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public abstract class AbstractStarsObject : MonoBehaviour {
     [SerializeField]
-    protected long id;
+    protected string id = Guid.NewGuid().ToString();
 
     public virtual void prePersist()
     {
 
     }
 
-    public void setID(long id)
+    public void setID(string id)
     {
         this.id = id;
     }
 
-    public long getID()
+    public string getID()
     {
+        if(id == null || id == "")
+            id = Guid.NewGuid().ToString();
+
         return id;
     }
+
 }

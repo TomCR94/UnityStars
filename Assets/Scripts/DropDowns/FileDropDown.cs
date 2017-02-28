@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 
 public class FileDropDown : MonoBehaviour
 {
-
+    public Generator generator;
     public string[] strings;
 
     [SerializeField]
@@ -26,6 +26,9 @@ public class FileDropDown : MonoBehaviour
             button.GetComponent<Button>().onClick.AddListener(
                 () => { ShowObject(button.GetComponentInChildren<Text>().text); }
                 );
+            button.GetComponent<Button>().onClick.AddListener(
+                 () => { menuPanel.gameObject.SetActive(false); }
+                 );
         }
     }
 
@@ -33,11 +36,14 @@ public class FileDropDown : MonoBehaviour
     {
         switch (command)
         {
+            case "Save":
+                generator.writeGameToJson();
+                break;
             case "Exit":
                 SceneManager.LoadScene(0);
                 break;
-            case "Open Race File":
-                Application.OpenURL(Application.persistentDataPath + "/Races/Humanoid.race");
+            case "Open Save Location":
+                Application.OpenURL(Application.persistentDataPath);
                 break;
             default:
                 break;

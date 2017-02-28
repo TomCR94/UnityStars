@@ -2,7 +2,8 @@
 using UnityEngine;
 using System;
 
-public class User : AbstractStarsObject {
+[Serializable]
+public class User : AbstractStarsObject_NonMono {
 
     [SerializeField]
     private string name;

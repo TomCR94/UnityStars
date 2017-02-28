@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Fleet : MapObject, CargoHolder {
     [SerializeField]
@@ -43,6 +44,7 @@ public class Fleet : MapObject, CargoHolder {
     public void CloneFrom(Fleet fleet)
     {
         this._name = fleet._name;
+        this.setID(fleet.getID());
         this.x = fleet.x;
         this.y = fleet.y;
         this.owner = fleet.owner;
@@ -58,6 +60,10 @@ public class Fleet : MapObject, CargoHolder {
 
     private void Update()
     {
+            GetComponent<Image>().enabled = getOrbiting() == null;
+            GetComponent<Button>().enabled = getOrbiting() == null;
+
+            transform.localPosition = new Vector3(GetComponent<Fleet>().getX() - Game.instance.getWidth() / 2, GetComponent<Fleet>().getY() - Game.instance.getHeight() / 2);
     }
 
 

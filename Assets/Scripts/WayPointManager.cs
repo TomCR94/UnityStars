@@ -53,4 +53,12 @@ public class WayPointManager : MonoBehaviour {
         }
         wpList.Clear();
     }
+
+
+    public void removeWaypoint(Transform transform)
+    {
+        Settings.instance.selected.GetComponent<Fleet>().getWaypoints().RemoveAt(transform.GetSiblingIndex() - 1);
+
+        clear();
+    }
 }

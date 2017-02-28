@@ -77,7 +77,6 @@ public class PlayerTechs
         hullComponents = new List<TechHullComponent>();
 
         bestEngine = addPlayerTechs(player, techStore.getAllEngines(), engines);
-        Debug.Log(bestEngine);
         bestScanner = addPlayerTechs(player, techStore.getAllScanners(), scanners);
         bestShield = addPlayerTechs(player, techStore.getAllShields(), shields);
         bestArmor = addPlayerTechs(player, techStore.getAllArmor(), armor);
@@ -142,13 +141,10 @@ private T addPlayerTechs<T>(Player player, List<T> techs, List<T> internalList) 
 {
     foreach (T tech in techs)
     {
-        Debug.Log("tech: " + tech);
         if (player.hasTech(tech))
         {
             internalList.Add(tech);
-
-                Debug.Log("tech: " + tech + " added");
-            }
+        }
     }
 
     if (internalList.Count > 0)

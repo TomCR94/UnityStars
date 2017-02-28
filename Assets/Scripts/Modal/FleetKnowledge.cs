@@ -6,7 +6,7 @@ using UnityEngine;
 public class FleetKnowledge : AbstractStarsObject {
 
     
-    private long fleetId;
+    private string fleetId;
 
     /**
      * Do we have knowledge of this fleet by penetrating scanners? We don't keep knowledge of
@@ -38,12 +38,12 @@ public class FleetKnowledge : AbstractStarsObject {
         return pen;
     }
 
-    public void setFleetId(long fleetId)
+    public void setFleetId(string fleetId)
     {
         this.fleetId = fleetId;
     }
 
-    public long getFleetId()
+    public string getFleetId()
     {
         return fleetId;
     }

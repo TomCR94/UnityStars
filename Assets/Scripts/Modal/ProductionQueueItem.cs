@@ -119,6 +119,16 @@ public class ProductionQueueItem : AbstractStarsObject_NonMono {
         this.quantity = quantity;
     }
 
+    public void addQuantity(int quantity)
+    {
+        this.quantity += quantity;
+    }
+
+    public void incrementQuantity()
+    {
+        this.quantity++;
+    }
+
     public ShipDesign getShipDesign()
     {
         return shipDesign;

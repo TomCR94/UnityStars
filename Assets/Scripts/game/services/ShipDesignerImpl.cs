@@ -27,10 +27,6 @@ public ShipDesign designShip(TechHull hull, Player player)
         }
         else if (types.Contains(HullSlotType.Shield))
         {
-                Debug.Log(slot);
-                Debug.Log(player.getTechs().getBestShield());
-
-
             design.assignSlot(slot, player.getTechs().getBestShield(), slot.getQuantity());
         }
         else if (types.Contains(HullSlotType.Armor))
@@ -67,9 +63,7 @@ public ShipDesign designShip(TechHull hull, Player player)
         TechHull hull = StaticTechStore.getInstance().getHull(design.getHullName());
         design.setHull(hull);
         for (int slotIndex = 0; slotIndex < hull.getSlots().Count; slotIndex++)
-        {
-            Debug.Log(slotIndex);
-            
+        {          
             // Fill in the TechHullSlot for this index 
             ShipDesignSlot designSlot = design.getSlots()[slotIndex];
             if (designSlot.getHullComponentName() == null)

@@ -309,7 +309,7 @@ private void buildFleet(Planet planet, ProductionQueueItem item, int numBuilt)
         fleet.getShipStacks().Add(new ShipStack(item.getShipDesign(), item.getQuantity()));
         fleet.computeAggregate();
 
-        GameObject go = GameObject.Instantiate(Resources.Load("Fleet") as GameObject, planet.transform);
+        GameObject go = GameObject.Instantiate(Resources.Load("Fleet") as GameObject, planet.transform, false);
         go.transform.position = Vector3.zero;
         go.GetComponent<Fleet>().CloneFrom(fleet);
         fleet = go.GetComponent<Fleet>();
@@ -320,7 +320,7 @@ private void buildFleet(Planet planet, ProductionQueueItem item, int numBuilt)
         fleet.setOrbiting(planet);
         fleet.addWaypoint(fleet.getX(), fleet.getY(), 5, WaypointTask.None, planet);
         planet.getOrbitingFleets().Add(fleet);
-        planet.getOwner().getGame().getFleets().Add(fleet);
+        planet.getOwner().getGame().addFleet(fleet);
     }
 }
 
@@ -345,7 +345,7 @@ private void buildStarbase(Planet planet, ProductionQueueItem item)
         fleet.computeAggregate();
         fleet.addWaypoint(planet.getX(), planet.getY(), 5, WaypointTask.None, planet);
         planet.setStarbase(fleet);
-        planet.getOwner().getGame().getFleets().Add(fleet);
+        planet.getOwner().getGame().addFleet(fleet);
     }
 }
 

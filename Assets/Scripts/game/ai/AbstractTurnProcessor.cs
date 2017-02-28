@@ -74,6 +74,5 @@ public Planet closestPlanet(Fleet fleet, List<Planet> unknownPlanets)
 
     public void process()
     {
-        throw new NotImplementedException();
     }
 }

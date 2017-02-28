@@ -104,6 +104,11 @@ public class Mineral {
         this.ironium = ironium;
     }
 
+    public void addIronium(int ironium)
+    {
+        this.ironium += ironium;
+    }
+
     public int getBoranium()
     {
         return boranium;
@@ -114,6 +119,11 @@ public class Mineral {
         this.boranium = boranium;
     }
 
+    public void addBoranium(int boranium)
+    {
+        this.boranium += boranium;
+    }
+
     public int getGermanium()
     {
         return germanium;
@@ -122,5 +132,10 @@ public class Mineral {
     public void setGermanium(int germanium)
     {
         this.germanium = germanium;
+    }
+
+    public void addGermanium(int germanium)
+    {
+        this.germanium += germanium;
     }
 }

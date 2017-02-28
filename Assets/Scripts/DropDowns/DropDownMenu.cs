@@ -29,6 +29,9 @@ public class DropDownMenu : MonoBehaviour
             button.GetComponent<Button>().onClick.AddListener(
                 () => { ShowObject(index); }
                 );
+            button.GetComponent<Button>().onClick.AddListener(
+                 () => { menuPanel.gameObject.SetActive(false); }
+                 );
         }
     }
 
@@ -36,6 +39,7 @@ public class DropDownMenu : MonoBehaviour
     {
         objects[index].transform.SetParent(UIPanel.transform);
         objects[index].transform.localPosition = Vector2.zero;
+        objects[index].GetComponentInChildren<DragPanel>().enabled = true;
     }
 
     string AddSpacesToSentence(string text, bool preserveAcronyms)

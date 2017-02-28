@@ -46,4 +46,9 @@ public class FleetsInOrbit : MonoBehaviour {
         Settings.instance.selected = Settings.instance.selected.GetComponent<Planet>().transform.GetChild(fleets.value).gameObject;
     }
 
+    public void Cargo()
+    {
+        CargoTransfer.instance.init(Settings.instance.selected.GetComponent<Planet>().transform.GetChild(fleets.value).GetComponent<Fleet>());
+    }
+
 }

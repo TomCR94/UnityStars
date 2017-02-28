@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
+using System;
 
 public class Planet : MapObject, CargoHolder {
 
@@ -57,6 +58,7 @@ public class Planet : MapObject, CargoHolder {
     public void clone(Planet planet)
     {
         _name = planet._name;
+        setID(planet.getID());
         x = planet.x;
         y = planet.y;
 
@@ -80,9 +82,16 @@ public class Planet : MapObject, CargoHolder {
     {
         if (getOwner() != null)
         {
-            long playerID = getOwner().getRace().getPlayerId();
-            if (playerID >= 0 && playerColors.Length > playerID)
-            GetComponent<Image>().color = playerColors[playerID];
+            for (int i = 0; i < Game.instance.getPlayers().Count; i++)
+            {
+                if (getOwner().getID() == Game.instance.getPlayers()[i].getID())
+                {
+                    GetComponent<Image>().color = playerColors[i];
+                    break;
+                }
+
+            }
+
         }
     }
 

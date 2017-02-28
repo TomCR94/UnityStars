@@ -3,11 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UnityEngine.Events;
 public class Spinner : MonoBehaviour {
 
     public int maxValue, minValue, step = 1;
     public int value;
     Button up, down;
+    [Space]
+    [SerializeField]
+    public SpinnerCallback method;
 
 	// Use this for initialization
 	void Start ()
@@ -25,12 +29,14 @@ public class Spinner : MonoBehaviour {
             {
                 value+=step;
                 GetComponent<Text>().text = value.ToString();
+                method.Invoke(value);
                 EventSystem.current.SetSelectedGameObject(null);
             }
             else if (EventSystem.current.currentSelectedGameObject.Equals(down.gameObject) && value - step >= minValue)
             {
                 value-=step;
                 GetComponent<Text>().text = value.ToString();
+                method.Invoke(value);
                 EventSystem.current.SetSelectedGameObject(null);
             }
 

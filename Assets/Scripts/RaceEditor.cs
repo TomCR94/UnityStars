@@ -14,7 +14,7 @@ public class RaceEditor : MonoBehaviour {
     public ToggleGroup lrts;
     // Use this for initialization
     void Start () {
-        race = new global::Race();
+        race = new Race();
         race.setHumanoid();
         spendRemainingPoints.ClearOptions();
         List<string> list = new List<string>();
@@ -23,35 +23,13 @@ public class RaceEditor : MonoBehaviour {
 
         singleName.text = race.getName();
         pluralName.text = race.getPluralName();
-        
+
         foreach (Toggle tg in predefinedRaceCharac.ActiveToggles())
         {
             if (tg.name == Enum.GetName(typeof(PRT), race.getPRT()))
                 tg.isOn = true;
             else
                 tg.isOn = false;
-        }
-
-        foreach (Toggle tg in lrts.ActiveToggles())
-        {
-            if (race.getLrts().Count > 0)
-                foreach (LRT lrt in race.getLrts())
-                {
-
-                    Debug.Log(tg.name);
-                    Debug.Log(Enum.GetName(typeof(LRT), lrt));
-                    if (tg.name == Enum.GetName(typeof(LRT), lrt))
-                    {
-                        tg.isOn = true;
-                        break;
-                    }
-                    else
-                        tg.isOn = false;
-                }
-            else
-            {
-                tg.isOn = false;
-            }
         }
 
         transform.GetChild(0).gameObject.SetActive(true);
@@ -61,6 +39,106 @@ public class RaceEditor : MonoBehaviour {
         transform.GetChild(4).gameObject.SetActive(false);
         transform.GetChild(5).gameObject.SetActive(false);
 
+    }
+
+    public void setRaceName(string name)
+    {
+        race.setName(name);
+    }
+    public void setRacePluralName(string name)
+    {
+        race.setPluralName(name);
+    }
+    public void setRacePassword(string pass)
+    {
+    }
+
+    public void setLeftoverPoints(int index)
+    {
+        race.setSpendLeftoverPointsOn((SpendLeftoverPointsOn)index);
+    }
+    public void setPrimaryRaceTrait(int index)
+    {
+        race.setPRT((PRT)index);
+    }
+
+    public void setLesserRaceTrait(int index)
+    {
+        if (race.getLrts().Contains((LRT)index))
+            race.getLrts().Remove((LRT)index);
+        else
+            race.getLrts().Add((LRT)index);
+    }
+
+    public void SetResourcesGenPerColonist(int amount)
+    {
+        race.setColonistsPerResource(amount);
+    }
+
+    public void FactoriesProduce(int amount)
+    {
+        race.setFactoryOutput(amount);
+    }
+
+    public void FactoriesCost(int amount)
+    {
+        race.setFactoryCost(amount);
+    }
+
+    public void setNumFactories(int amount)
+    {
+        race.setNumFactories(amount);
+    }
+
+    public void FactoriesCostLess(bool costLess)
+    {
+        race.setFactoriesCostLess(costLess);
+    }
+
+    public void MinesProduce(int amount)
+    {
+        race.setMineOutput(amount);
+    }
+
+    public void MinesCost(int amount)
+    {
+        race.setMineCost(amount);
+    }
+
+    public void colonistsForMine(int amount)
+    {
+        race.setNumMines(amount);
+    }
+
+    public void setEnergyResearchLevel(int level)
+    {
+        race.getResearchCost().setEnergy((ResearchCostLevel)level);
+    }
+
+    public void setWeaponsResearchLevel(int level)
+    {
+        race.getResearchCost().setWeapons((ResearchCostLevel)level);
+    }
+
+    public void setPropulsionResearchLevel(int level)
+    {
+        race.getResearchCost().setPropulsion((ResearchCostLevel)level);
+    }
+
+
+    public void setConstructionResearchLevel(int level)
+    {
+        race.getResearchCost().setConstruction((ResearchCostLevel)level);
+    }
+
+    public void setElectronicsResearchLevel(int level)
+    {
+        race.getResearchCost().setElectronics((ResearchCostLevel)level);
+    }
+
+    public void setBiotechnologyResearchLevel(int level)
+    {
+        race.getResearchCost().setBiotechnology((ResearchCostLevel)level);
     }
 
     public void Finish()

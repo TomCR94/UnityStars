@@ -1,14 +1,19 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+[System.Serializable]
 public class ResearchCost {
-
+    [SerializeField]
     private ResearchCostLevel energy;
+    [SerializeField]
     private ResearchCostLevel weapons;
+    [SerializeField]
     private ResearchCostLevel propulsion;
+    [SerializeField]
     private ResearchCostLevel construction;
+    [SerializeField]
     private ResearchCostLevel electronics;
+    [SerializeField]
     private ResearchCostLevel biotechnology;
 
     public ResearchCost() : base()

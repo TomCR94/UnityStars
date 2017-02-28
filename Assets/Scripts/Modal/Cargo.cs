@@ -90,6 +90,11 @@ public class Cargo : Mineral {
         this.colonists = colonists;
     }
 
+    public void addColonists(int colonists)
+    {
+        this.colonists += colonists;
+    }
+
     public int getColonists()
     {
         return colonists;

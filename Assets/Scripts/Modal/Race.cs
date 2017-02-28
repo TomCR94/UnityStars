@@ -553,13 +553,8 @@ public class Race : AbstractStarsObject_NonMono {
     {
         return player;
     }
-
-    public void setPlayerId(long playerId)
-    {
-        player.setID(playerId);
-    }
-
-    public long getPlayerId()
+    
+    public string getPlayerId()
     {
         return player.getID();
     }

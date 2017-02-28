@@ -449,7 +449,7 @@ public class TurnGenerator
                         }
                     }
                 }
-                game.getFleets().Remove(fleet);
+                game.removeFleet(fleet);
             }
         }
 
@@ -638,13 +638,15 @@ public class TurnGenerator
         {
             if (player.isAi())
             {
-                TurnProcessor processor = ScoutTurnProcessor.instance;
+                Debug.Log("Processing AI turn");
+
+                ScoutTurnProcessor processor = ScoutTurnProcessor.instance;
                 processor.init(player);
                 processor.process();
 
-                processor = ColonizerTurnProcessor.instance;
-                processor.init(player);
-                processor.process();
+                ColonizerTurnProcessor cProcessor = ColonizerTurnProcessor.instance;
+                cProcessor.init(player);
+                cProcessor.process();
 
                 if (player.isAi())
                 {

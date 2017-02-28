@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-public class Player : AbstractStarsObject {
+[Serializable]
+public class Player : AbstractStarsObject_NonMono {
 
 
     /**
@@ -31,22 +32,16 @@ public class Player : AbstractStarsObject {
     private List<ShipDesign> designs = new List<ShipDesign>();
 
     /**
-     * The game this player belongs to
-     */
-    [SerializeField]
-    private Game game;
-
-    /**
      * The Messages for this player
      */
     [SerializeField]
     private List<Message> messages = new List<Message>();
 
     [SerializeField]
-    private Dictionary<long, FleetKnowledge> fleetKnowledges = new Dictionary<long, FleetKnowledge>();
+    private Dictionary<string, FleetKnowledge> fleetKnowledges = new Dictionary<string, FleetKnowledge>();
 
     [SerializeField]
-    private Dictionary<long, PlanetKnowledge> planetKnowledges = new Dictionary<long, PlanetKnowledge>();
+    private Dictionary<string, PlanetKnowledge> planetKnowledges = new Dictionary<string, PlanetKnowledge>();
 
     [SerializeField]
     private String name;
@@ -99,11 +94,6 @@ public class Player : AbstractStarsObject {
      */
     [SerializeField]
     private bool accepted = false;
-
-    /**
-     * is this player an AI player?
-     */
-    private bool ai = false;
     
     [SerializeField]
     private PlayerTechs techs = new PlayerTechs();
@@ -117,7 +107,6 @@ public class Player : AbstractStarsObject {
         numFleetsBuilt = 0;
         submittedTurn = false;
         accepted = false;
-        ai = false;
     }
 
     public Player(User user)
@@ -294,7 +283,7 @@ public class Player : AbstractStarsObject {
         planetKnowledges.TryGetValue(planet.getID(), out knowledge);
 
         // discover this planet by copying the root knowledge to the user knowledge
-        knowledge.discover(game.getYear(), planet);
+        knowledge.discover(Game.instance.getYear(), planet);
     }
 
     /**
@@ -365,12 +354,12 @@ public class Player : AbstractStarsObject {
 
     public Game getGame()
     {
-        return game;
+        return Game.instance;
     }
 
     public void setGame(Game game)
     {
-        this.game = game;
+        Game.instance = game;
     }
 
     public TechLevel getTechLevels()
@@ -455,12 +444,12 @@ public class Player : AbstractStarsObject {
 
     public bool isAi()
     {
-        return ai;
+        return getUser().isAi();
     }
 
     public void setAi(bool ai)
     {
-        this.ai = ai;
+        getUser().setAi(ai);
     }
 
     public void setName(string name)
@@ -513,22 +502,22 @@ public class Player : AbstractStarsObject {
         return techs;
     }
 
-    public Dictionary<long, FleetKnowledge> getFleetKnowledges()
+    public Dictionary<string, FleetKnowledge> getFleetKnowledges()
     {
         return fleetKnowledges;
     }
 
-    public void setFleetKnowledges(Dictionary<long, FleetKnowledge> knowledges)
+    public void setFleetKnowledges(Dictionary<string, FleetKnowledge> knowledges)
     {
         this.fleetKnowledges = knowledges;
     }
 
-    public void setPlanetKnowledges(Dictionary<long, PlanetKnowledge> planetKnowledges)
+    public void setPlanetKnowledges(Dictionary<string, PlanetKnowledge> planetKnowledges)
     {
         this.planetKnowledges = planetKnowledges;
     }
 
-    public Dictionary<long, PlanetKnowledge> getPlanetKnowledges()
+    public Dictionary<string, PlanetKnowledge> getPlanetKnowledges()
     {
         return planetKnowledges;
     }
