@@ -7,11 +7,16 @@ public class PlanetControllerImpl : PlanetController
 {
     
     private FleetController fleetController;
+    public GameObject baseFleet;
+    private Transform mapObject;
+    private GameGameObject game;
 
-
-    public PlanetControllerImpl(FleetController fleetCont)
+    public PlanetControllerImpl(FleetController fleetCont, Transform mapObj, GameGameObject game, GameObject baseFleet)
     {
         fleetController = fleetCont;
+        mapObject = mapObj;
+        this.game = game;
+        this.baseFleet = baseFleet;
     }
 
 /**
@@ -19,15 +24,17 @@ public class PlanetControllerImpl : PlanetController
  */
 private static QueueItemType[] autoBuildTypes = EnumSet<QueueItemType>.of(QueueItemType.AutoAlchemy, QueueItemType.AutoMine, QueueItemType.AutoDefense,
                                                                         QueueItemType.AutoFactory);
-/**
- * Create a new planet
- * 
- * @param name The name of the planet
- * @param x The x coord of the planet
- * @param y The y coord of the planet
- * @return The newly created planet
- */
-public Planet create(string name, int x, int y)
+
+
+    /**
+* Create a new planet
+* 
+* @param name The name of the planet
+* @param x The x coord of the planet
+* @param y The y coord of the planet
+* @return The newly created planet
+*/
+    public Planet create(string name, int x, int y)
 {
     return new Planet(name, x, y);
 
@@ -297,31 +304,32 @@ private void buildFleet(Planet planet, ProductionQueueItem item, int numBuilt)
         }
     }
 
-    // if (we didn't have a fleet of that name, or it wasn't defined
-    // just add this fleet as it's own entity
-    if (!foundFleet)
-    {
-        Fleet fleet = fleetController.create(
-            name,
-            planet.getX(),
-            planet.getY(),
-            planet.getOwner());
-        fleet.getShipStacks().Add(new ShipStack(item.getShipDesign(), item.getQuantity()));
-        fleet.computeAggregate();
+        // if (we didn't have a fleet of that name, or it wasn't defined
+        // just add this fleet as it's own entity
+        if (!foundFleet)
+        {
+            Fleet fleet = fleetController.create(
+                name,
+                planet.getX(),
+                planet.getY(),
+                planet.getOwner());
+            fleet.getShipStacks().Add(new ShipStack(item.getShipDesign(), item.getQuantity()));
+            fleet.computeAggregate();
 
-        GameObject go = GameObject.Instantiate(Resources.Load("Fleet") as GameObject, planet.transform, false);
-        go.transform.position = Vector3.zero;
-        go.GetComponent<Fleet>().CloneFrom(fleet);
-        fleet = go.GetComponent<Fleet>();
-        go.name = fleet.getName();
-        go.SetActive(true);
+            GameObject go = GameObject.Instantiate(baseFleet, planet.PlanetGameObject.transform, false);
+            go.transform.position = Vector3.zero;
 
-            fleet.setFuel(fleet.getAggregate().getFuelCapacity());
-        fleet.setOrbiting(planet);
-        fleet.addWaypoint(fleet.getX(), fleet.getY(), 5, WaypointTask.None, planet);
-        planet.getOrbitingFleets().Add(fleet);
-        planet.getOwner().getGame().addFleet(fleet);
-    }
+
+            go.GetComponent<FleetGameObject>().setFleet(fleet);
+            go.name = fleet.getName();
+            go.SetActive(true);
+
+            go.GetComponent<FleetGameObject>().getFleet().setFuel(fleet.getAggregate().getFuelCapacity());
+            go.GetComponent<FleetGameObject>().getFleet().setOrbiting(planet);
+            go.GetComponent<FleetGameObject>().getFleet().addWaypoint(fleet.getX(), fleet.getY(), 5, WaypointTask.None, planet);
+            //planet.getOrbitingFleets().Add(go.GetComponent<FleetGameObject>().getFleet());
+            game.getGame().addFleet(go.GetComponent<FleetGameObject>().getFleet());
+        }
 }
 
 /**
@@ -329,24 +337,24 @@ private void buildFleet(Planet planet, ProductionQueueItem item, int numBuilt)
  */
 private void buildStarbase(Planet planet, ProductionQueueItem item)
 {
-    if (planet.getStarbase() != null)
-    {
-        // upgrade the existing starbase
-        planet.getStarbase().getShipStacks().Clear();
-        planet.getStarbase().getShipStacks().Add(new ShipStack(item.getShipDesign(), 1));
-        planet.getStarbase().setDamage(0);
-        planet.getStarbase().computeAggregate();
-    }
-    else
-    {
-        // create a new starbase
-        Fleet fleet = fleetController.create(planet.getName() + "-starbase", planet.getX(), planet.getY(), planet.getOwner());
-        fleet.getShipStacks().Add(new ShipStack(item.getShipDesign(), 1));
-        fleet.computeAggregate();
-        fleet.addWaypoint(planet.getX(), planet.getY(), 5, WaypointTask.None, planet);
-        planet.setStarbase(fleet);
-        planet.getOwner().getGame().addFleet(fleet);
-    }
+        if (planet.getStarbase() != null)
+        {
+            // upgrade the existing starbase
+            planet.getStarbase().getShipStacks().Clear();
+            planet.getStarbase().getShipStacks().Add(new ShipStack(item.getShipDesign(), 1));
+            planet.getStarbase().setDamage(0);
+            planet.getStarbase().computeAggregate();
+        }
+        else
+        {
+            // create a new starbase
+            Fleet fleet = fleetController.create(planet.getName() + "-starbase", planet.getX(), planet.getY(), planet.getOwner());
+            fleet.getShipStacks().Add(new ShipStack(item.getShipDesign(), 1));
+            fleet.computeAggregate();
+            fleet.addWaypoint(planet.getX(), planet.getY(), 5, WaypointTask.None, planet);
+            planet.setStarbase(fleet);
+            game.getGame().addFleet(fleet);
+        }
 }
 
 /**

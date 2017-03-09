@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MapObject : AbstractStarsObject {
+[System.Serializable]
+public class MapObject : AbstractStarsObject_NonMono {
 
     [SerializeField]
     protected string _name;

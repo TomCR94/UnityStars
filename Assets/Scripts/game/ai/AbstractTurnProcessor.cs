@@ -11,9 +11,12 @@ public abstract class AbstractTurnProcessor : MonoBehaviour, TurnProcessor
      */
     protected Player player;
 
-public void init(Player player)
+    protected Game game;
+
+public void init(Player player, Game game)
 {
     this.player = player;
+        this.game = game;
 }
 
 /**

@@ -4,18 +4,20 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 using System.IO;
-[ExecuteInEditMode]
+
 public class RaceEditor : MonoBehaviour {
     public Race race;
     [Space]
     public InputField singleName, pluralName;
     public Dropdown spendRemainingPoints;
     public ToggleGroup predefinedRaceCharac;
-    public ToggleGroup lrts;
+    public Text advantagePoints;
+    public Button[] FinishButton;
     // Use this for initialization
     void Start () {
         race = new Race();
         race.setHumanoid();
+        Finish();
         spendRemainingPoints.ClearOptions();
         List<string> list = new List<string>();
         list.AddRange(Enum.GetNames(typeof(SpendLeftoverPointsOn)));
@@ -39,6 +41,15 @@ public class RaceEditor : MonoBehaviour {
         transform.GetChild(4).gameObject.SetActive(false);
         transform.GetChild(5).gameObject.SetActive(false);
 
+    }
+
+    private void Update()
+    {
+        int advPoints = RacePointsCalculator.getAdvantagePoints(race);
+        advantagePoints.text = "Advantage Points Left: " + advPoints;
+
+        foreach (Button button in FinishButton)
+            button.interactable = advPoints >= 0;
     }
 
     public void setRaceName(string name)
@@ -142,6 +153,11 @@ public class RaceEditor : MonoBehaviour {
     }
 
     public void Finish()
+    {
+        writeToRaceFile(race);
+    }
+
+    public static void writeToRaceFile(Race race)
     {
         Debug.Log(JsonUtility.ToJson(race, true));
 

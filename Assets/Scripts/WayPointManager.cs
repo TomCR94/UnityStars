@@ -14,16 +14,16 @@ public class WayPointManager : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-        isOn = Settings.instance.selected != null && Settings.instance.selected.GetComponent<Fleet>() != null;
+        isOn = Settings.instance.selectedFleet != null;
         
         if (isOn)
         {
-            if (selectedFleet != Settings.instance.selected.GetComponent<Fleet>())
+            if (selectedFleet != Settings.instance.selectedFleet)
             {
                 clear();
-                selectedFleet = Settings.instance.selected.GetComponent<Fleet>();
+                selectedFleet = Settings.instance.selectedFleet;
             }
-            foreach (Waypoint wp in Settings.instance.selected.GetComponent<Fleet>().getWaypoints())
+            foreach (Waypoint wp in Settings.instance.selectedFleet.getWaypoints())
             {
                 if (!wpList.Contains(wp) && wp.getTarget() !=null)
                 {
@@ -57,7 +57,7 @@ public class WayPointManager : MonoBehaviour {
 
     public void removeWaypoint(Transform transform)
     {
-        Settings.instance.selected.GetComponent<Fleet>().getWaypoints().RemoveAt(transform.GetSiblingIndex() - 1);
+        Settings.instance.selectedFleet.getWaypoints().RemoveAt(transform.GetSiblingIndex() - 1);
 
         clear();
     }

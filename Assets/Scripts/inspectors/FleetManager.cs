@@ -16,13 +16,13 @@ public class FleetManager : MonoBehaviour
 
     private void Update()
     {
-        isOn = Settings.instance.selected != null && Settings.instance.selected.GetComponent<Fleet>() != null;
+        isOn = Settings.instance.selectedFleet != null;
 
         targetButton.interactable = add.interactable = dropdown.interactable = isOn;
 
         if (isOn)
         {
-            fleetText.text = "Fleet: " + Settings.instance.selected.GetComponent<Fleet>().getName();
+            fleetText.text = "Fleet: " + Settings.instance.selectedFleet.getName();
         }
         else
             fleetText.text = "Fleet: ";
@@ -38,7 +38,7 @@ public class FleetManager : MonoBehaviour
     {
         if (isOn)
         {
-            Settings.instance.selected.GetComponent<Fleet>().addWaypoint(target.getX(), target.getY(), 5, task, target);
+            Settings.instance.selectedFleet.addWaypoint(target.getX(), target.getY(), 5, task, target);
         }
     }
 

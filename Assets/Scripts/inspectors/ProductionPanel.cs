@@ -18,12 +18,12 @@ public class ProductionPanel : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
-        manageButton.interactable = (Settings.instance.selected != null && Settings.instance.selected.GetComponent<Planet>() != null);	
+        manageButton.interactable = (Settings.instance.selectedPlanet != null);	
 	}
 
     public void init()
     {
-        if (Settings.instance.selected != null && Settings.instance.selected.GetComponent<Planet>() != null)
+        if (Settings.instance.selectedPlanet != null)
         {
             for (int i = 0; i < currentContentPanel.transform.childCount; i++)
             {
@@ -31,7 +31,7 @@ public class ProductionPanel : MonoBehaviour {
                     GameObject.Destroy(currentContentPanel.transform.GetChild(i).gameObject);
             }
 
-            List<string> prodNames = Settings.instance.selected.GetComponent<Planet>().getQueue().getItems().Select(e => GetProductionItemName(e)).ToList();
+            List<string> prodNames = Settings.instance.selectedPlanet.getQueue().getItems().Select(e => GetProductionItemName(e)).ToList();
 
             foreach (string prodName in prodNames)
             {

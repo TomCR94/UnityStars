@@ -11,12 +11,6 @@ public class Race : AbstractStarsObject_NonMono {
 
     [SerializeField]
     public RaceType raceType;
-
-    [SerializeField]
-    private User user;
-
-    [SerializeField]
-    private Player player;
    
     [SerializeField]
     private string name;
@@ -88,7 +82,7 @@ public class Race : AbstractStarsObject_NonMono {
      */
     public Race(Race race, Player player)
     {
-        this.user = race.user;
+        //this.user = race.user;
         this.name = race.name;
         this.pluralName = race.pluralName;
         this.prt = race.prt;
@@ -109,7 +103,7 @@ public class Race : AbstractStarsObject_NonMono {
         this.immuneRad = race.immuneRad;
         this.spendLeftoverPointsOn = race.spendLeftoverPointsOn;
         this.researchCost = new ResearchCost(race.researchCost);
-        this.player = player;
+        //this.player = player;
 
         this.init();
     }
@@ -139,10 +133,10 @@ public class Race : AbstractStarsObject_NonMono {
      * 
      * @return A Humanoid race
      */
-    public static Race getHumanoid(User user)
+    public static Race getHumanoid()
     {
         Race race = new Race();
-        race.setUser(user);
+        //race.setUser(user);
         race.setName("Humanoid");
         race.setPluralName("Humanoids");
 
@@ -171,7 +165,7 @@ public class Race : AbstractStarsObject_NonMono {
     }
 
 
-    public void setHumanoid()
+    public Race setHumanoid()
     {
         setName("Humanoid");
         setPluralName("Humanoids");
@@ -197,6 +191,8 @@ public class Race : AbstractStarsObject_NonMono {
                                              ResearchCostLevel.Standard, ResearchCostLevel.Standard);
 
         init();
+
+        return this;
     }
 
     /**
@@ -519,15 +515,15 @@ public class Race : AbstractStarsObject_NonMono {
         this.researchCost = researchCost;
     }
 
-    public void setUser(User user)
-    {
-        this.user = user;
-    }
+    //public void setUser(User user)
+   // {
+    //    this.user = user;
+  //  }
 
-    public User getUser()
-    {
-        return user;
-    }
+    //public User getUser()
+ //   {
+   //     return user;
+ //   }
 
     public void setPRT(PRT prt)
     {
@@ -544,20 +540,20 @@ public class Race : AbstractStarsObject_NonMono {
         return prt;
     }
 
-    public void setPlayer(Player player)
-    {
-        this.player = player;
-    }
+    //public void setPlayer(Player player)
+   // {
+     //   this.player = player;
+   // }
 
-    public Player getPlayer()
-    {
-        return player;
-    }
+  //  public Player getPlayer()
+  //  {
+   //     return player;
+  //  }
     
-    public string getPlayerId()
-    {
-        return player.getID();
-    }
+  //  public string getPlayerId()
+   // {
+  //      return player.getID();
+ //   }
 
     /**
      * Get the research cost for a tech field/level

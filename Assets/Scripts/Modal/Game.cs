@@ -1,15 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-public class Game : AbstractStarsObject {
-
-
+[System.Serializable]
+public class Game : AbstractStarsObject_NonMono {
+    
     [SerializeField]
-    private User host;
-
-    [SerializeField]
-    private string name;
+    private string name = "Game1";
 
     [SerializeField]
     private Size size;
@@ -33,47 +31,13 @@ public class Game : AbstractStarsObject {
     [SerializeField]
     private List<Player> players = new List<Player>();
 
-    //Dont serialize these lists
-    private List<Planet> planets = new List<Planet>();
-    private List<Fleet> fleets = new List<Fleet>();
-
-    //Serialize references to their IDs instead    
-    [SerializeField]
-    private List<string> planetIDs = new List<string>();
-
-    [SerializeField]
-    private List<string> fleetIDs = new List<string>();
-
-    public static Game instance;
-
-    public Game()
-    {
-    }
-
-    
-    public Game(User host, string name, Size size, Density density, int numPlayers)
-    {
-        this.host = host;
-        this.name = name;
-        this.size = size;
-        this.density = density;
-        this.numPlayers = numPlayers;
-    }
-
-    private void Start()
-    {
-        instance = this;
-        for (int i = 0; i < transform.childCount; i++)
-            addPlayers(transform.GetChild(i).GetComponent<Player>());
-    }
-
     override public void prePersist()
     {
         foreach (Player player in players)
         {
             player.prePersist();
         }
-        foreach(Fleet fleet in fleets)
+        foreach(Fleet fleet in FleetDictionary.instance.fleetDict.Values.ToList())
         {
             fleet.prePersist();
         }
@@ -131,36 +95,32 @@ public class Game : AbstractStarsObject {
 
     public List<Planet> getPlanets()
     {
-        return planets;
+        return PlanetDictionary.instance.planetDict.Values.ToList();
     }
 
     public void addPlanet(Planet planet)
     {
-        this.planets.Add(planet);
-        this.planetIDs.Add(planet.getID());
+        PlanetDictionary.instance.planetDict.Add(planet.getID(), planet);
     }
 
     public void removePlanet(Planet planet)
     {
-        this.planets.Remove(planet);
-        this.planetIDs.Remove(planet.getID());
+        PlanetDictionary.instance.planetDict.Remove(planet.getID());
     }
 
     public List<Fleet> getFleets()
     {
-        return fleets;
+        return FleetDictionary.instance.fleetDict.Values.ToList();
     }
 
     public void addFleet(Fleet fleet)
     {
-        this.fleets.Add(fleet);
-        this.fleetIDs.Add(fleet.getID());
+        FleetDictionary.instance.fleetDict.Add(fleet.getID(), fleet);
     }
 
     public void removeFleet(Fleet fleet)
     {
-        this.fleets.Remove(fleet);
-        this.fleetIDs.Remove(fleet.getID());
+        FleetDictionary.instance.fleetDict.Remove(fleet.getID());
     }
 
     public void setYear(int year)
@@ -203,14 +163,14 @@ public class Game : AbstractStarsObject {
         return height;
     }
 
-    public void setHost(User host)
+    public Planet getPlanetByName(string name)
     {
-        this.host = host;
-    }
-
-    public User getHost()
-    {
-        return host;
+        foreach (Planet planet in PlanetDictionary.instance.planetDict.Values.ToList())
+        {
+            if (planet.getName() == name)
+                return planet;
+        }
+        return null;
     }
 
 }

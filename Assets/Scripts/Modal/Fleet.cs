@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+[System.Serializable]
 public class Fleet : MapObject, CargoHolder {
     [SerializeField]
-    private Player owner;
+    private string playerID;
 
+    private FleetGameObject fleetGameObject;
 
     [SerializeField]
     private List<ShipStack> shipStacks = new List<ShipStack>();
@@ -14,10 +16,9 @@ public class Fleet : MapObject, CargoHolder {
 
     [SerializeField]
     private List<Waypoint> waypoints = new List<Waypoint>();
-
-
+    
     [SerializeField]
-    private Planet orbiting;
+    private string orbitingID;
 
     [SerializeField]
     private int damage;
@@ -32,13 +33,26 @@ public class Fleet : MapObject, CargoHolder {
     [SerializeField]
     private FleetAggregate aggregate = new FleetAggregate();
 
+    public FleetGameObject FleetGameObject
+    {
+        get
+        {
+            return fleetGameObject;
+        }
+
+        set
+        {
+            fleetGameObject = value;
+        }
+    }
+
     public Fleet() : base()
     {
     }
 
     public Fleet(string name, int x, int y, Player owner) : base(name, x, y)
     {
-        this.owner = owner;
+        this.playerID = owner.getID();
     }
 
     public void CloneFrom(Fleet fleet)
@@ -47,25 +61,17 @@ public class Fleet : MapObject, CargoHolder {
         this.setID(fleet.getID());
         this.x = fleet.x;
         this.y = fleet.y;
-        this.owner = fleet.owner;
+        this.playerID = fleet.playerID;
         this.shipStacks = fleet.shipStacks;
         this.waypoints = fleet.waypoints;
-        this.orbiting = fleet.orbiting;
+        this.orbitingID = fleet.orbitingID;
+        this.setOrbiting(PlanetDictionary.instance.planetDict[orbitingID]);
         this.damage = fleet.damage;
         this.starbase = fleet.starbase;
         this.scrapped = fleet.scrapped;
         this.cargo = fleet.cargo;
         this.aggregate = fleet.aggregate;
     }
-
-    private void Update()
-    {
-            GetComponent<Image>().enabled = getOrbiting() == null;
-            GetComponent<Button>().enabled = getOrbiting() == null;
-
-            transform.localPosition = new Vector3(GetComponent<Fleet>().getX() - Game.instance.getWidth() / 2, GetComponent<Fleet>().getY() - Game.instance.getHeight() / 2);
-    }
-
 
     override public string ToString()
     {
@@ -221,7 +227,7 @@ public class Fleet : MapObject, CargoHolder {
         {
             player.getFleetKnowledges().Add(id, new FleetKnowledge(this));
         }
-        player.getFleetKnowledges().TryGetValue(id, out knowledge);
+        knowledge = player.getFleetKnowledges()[id];
 
         knowledge.discover(pen);
 
@@ -237,12 +243,15 @@ public class Fleet : MapObject, CargoHolder {
 
     public Player getOwner()
     {
-        return owner;
+        foreach (Player player in fleetGameObject.game.getGame().getPlayers())
+            if (player.getID() == playerID)
+                return player;
+        return null;
     }
 
     public void setOwner(Player owner)
     {
-        this.owner = owner;
+        this.playerID = owner.getID();
     }
 
     public List<ShipStack> getShipStacks()
@@ -328,24 +337,29 @@ public class Fleet : MapObject, CargoHolder {
     public void setOrbiting(Planet orbiting)
     {
         // remove ourselves from the orbiting list
-        if (this.orbiting != null)
+        if (this.getOrbiting() != null)
         {
-            this.orbiting.getOrbitingFleets().Remove(this);
-            this.transform.SetParent(transform.parent.parent);
+            this.getOrbiting().getOrbitingFleets().Remove(this);
+            this.FleetGameObject.transform.SetParent(this.FleetGameObject.transform.parent.parent);
         }
-        this.orbiting = orbiting;
+        if (orbiting != null)
+            this.orbitingID = orbiting.getID();
+        else
+            this.orbitingID = "";
 
         // add ourselves to the new orbiting planet
-        if (this.orbiting != null)
+        if (this.getOrbiting() != null)
         {
-            this.orbiting.getOrbitingFleets().Add(this);
-            this.transform.SetParent(orbiting.transform);
+            this.getOrbiting().getOrbitingFleets().Add(this);
+            this.FleetGameObject.transform.SetParent(orbiting.PlanetGameObject.transform);
         }
     }
 
     public Planet getOrbiting()
     {
-        return orbiting;
+        if (orbitingID == null || orbitingID == "")
+            return null;
+        return PlanetDictionary.instance.planetDict[orbitingID];
     }
 
 

@@ -5,11 +5,12 @@ using System.Text;
 using System.Linq;
 using System.IO;
 using UnityEngine.SceneManagement;
+using UnityEngine.Events;
 
 public class FileDropDown : MonoBehaviour
 {
-    public Generator generator;
     public string[] strings;
+    public UnityEvent[] events;
 
     [SerializeField]
     Transform menuPanel;
@@ -32,12 +33,13 @@ public class FileDropDown : MonoBehaviour
         }
     }
 
+
     void ShowObject(string command)
     {
         switch (command)
         {
             case "Save":
-                generator.writeGameToJson();
+                events[0].Invoke();
                 break;
             case "Exit":
                 SceneManager.LoadScene(0);

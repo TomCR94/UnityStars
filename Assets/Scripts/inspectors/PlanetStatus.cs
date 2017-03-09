@@ -14,9 +14,9 @@ public class PlanetStatus : MonoBehaviour
 
     private void Update()
     {
-        if (Settings.instance.selected != null && Settings.instance.selected.GetComponent<Planet>() != null)
+        if (Settings.instance.selectedPlanet != null )
         {
-            planet = Settings.instance.selected.GetComponent<Planet>();
+            planet = Settings.instance.selectedPlanet;
 
             title.text = "Minerals On Hand";
             Population.text = "Population: " + planet.getPopulation();

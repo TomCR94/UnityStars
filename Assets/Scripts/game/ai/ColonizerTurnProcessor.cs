@@ -67,7 +67,7 @@ public class ColonizerTurnProcessor : AbstractTurnProcessor
         // find all the planets we don't know about yet
         List<Planet> colonizablePlanets = new List<Planet>();
         List<Planet> buildablePlanets = new List<Planet>();
-        foreach (Planet planet in player.getGame().getPlanets())
+        foreach (Planet planet in game.getPlanets())
         {
             if (isColonizablePlanet(planet))
             {
@@ -83,7 +83,7 @@ public class ColonizerTurnProcessor : AbstractTurnProcessor
 
         // get all the fleets that can scan and don't have waypoints yet
         List<Fleet> colonizerFleets = new List<Fleet>();
-        foreach (Fleet fleet in player.getGame().getFleets())
+        foreach (Fleet fleet in game.getFleets())
         {
             if (isColonizerFleet(fleet))
             {
@@ -104,7 +104,7 @@ public class ColonizerTurnProcessor : AbstractTurnProcessor
         }
         if (target == null)
         {
-            Debug.Log("Found a colonizer {} going to a destination with no target!", fleet);
+            Debug.Log(string.Format("Found a colonizer {} going to a destination with no target!", fleet.getName()));
         }
     }
 

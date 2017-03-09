@@ -334,7 +334,7 @@ public class TurnGenerator
                     leftoverResources.Add(planet.getOwner(), leftoverResources[planet.getOwner()] + leftover);
 
                 planetController.grow(planet);
-                planet.getOwner().discover(planet);
+                planet.getOwner().discover(game, planet);
             }
         }
 
@@ -464,6 +464,8 @@ public class TurnGenerator
     {
         foreach (Player player in game.getPlayers())
         {
+            Debug.Log(player.getName());
+            Debug.Log(player.getTechs().getBestPlanetaryScanner());
             scanPlayer(player);
         }
     }
@@ -487,7 +489,7 @@ public class TurnGenerator
         List<Scanner> scanners = new List<Scanner>();
 
         // find all fleets that need to be scanned, or who act as scanners
-        foreach (Fleet fleet in player.getGame().getFleets())
+        foreach (Fleet fleet in game.getFleets())
         {
             if (fleet.getOwner().getID() == player.getID())
             {
@@ -508,11 +510,11 @@ public class TurnGenerator
         }
 
         // find all planets that need to be scanned, or who act as scanners
-        foreach (Planet planet in player.getGame().getPlanets())
+        foreach (Planet planet in game.getPlanets())
         {
             if (planet.getOwner() != null && planet.getOwner().getID() == player.getID())
             {
-                player.discover(planet);
+                player.discover(game, planet);
                 if (planet.isScanner())
                 {
                     scanners.Add(new Scanner(planet, planetScanRange, planetScanRangePen));
@@ -537,11 +539,13 @@ public class TurnGenerator
                 // if this planet to scan is within range, have the owner of 'planet' discover it
                 if (scanner.getMapObject().dist(planetToScan) <= scanner.getScanRangePen())
                 {
-                    player.discover(planetToScan);
+                    player.discover(game, planetToScan);
 
                     // discover any orbiting fleets
                     foreach (Fleet fleet in planetToScan.getOrbitingFleets())
                     {
+                        Debug.Log("Fleet: " + fleet.getName());
+                        Debug.Log("Fleet Owner: " + fleet.getOwner().getID());
                         if (fleet.getOwner().getID() != player.getID())
                         {
                             fleet.discover(player, true);
@@ -641,11 +645,11 @@ public class TurnGenerator
                 Debug.Log("Processing AI turn");
 
                 ScoutTurnProcessor processor = ScoutTurnProcessor.instance;
-                processor.init(player);
+                processor.init(player, game);
                 processor.process();
 
                 ColonizerTurnProcessor cProcessor = ColonizerTurnProcessor.instance;
-                cProcessor.init(player);
+                cProcessor.init(player, game);
                 cProcessor.process();
 
                 if (player.isAi())

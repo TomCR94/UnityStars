@@ -6,9 +6,7 @@ public class UniverseGenerator: MonoBehaviour {
 
     public GameObject basePlanet, planetParent;
     public GameObject baseFleet;
-
-
-    private Game game;
+    public GameGameObject game;
 
     private FleetController fleetController;
     private PlanetController planetController;
@@ -17,7 +15,7 @@ public class UniverseGenerator: MonoBehaviour {
     
     public void setUniverseGenerator(Game game, FleetController fleetController, PlanetController planetController, ShipDesigner shipDesigner, TechStore techStore)
     {
-        this.game = game;
+        this.game.setGame(game);
         this.fleetController = fleetController;
         this.planetController = planetController;
         this.shipDesigner = shipDesigner;
@@ -29,10 +27,10 @@ public class UniverseGenerator: MonoBehaviour {
      */
     public void generate()
     {
-        generatePlanets(game);
-        game.setYear(Consts.startingYear);
+        generatePlanets(game.getGame());
+        game.getGame().setYear(Consts.startingYear);
 
-        foreach (Player player in game.getPlayers())
+        foreach (Player player in game.getGame().getPlayers())
         {
 
             if (player.getRace().raceType == Race.RaceType.humanoid)
@@ -46,11 +44,11 @@ public class UniverseGenerator: MonoBehaviour {
 
             Message.info(player, "Welcome to the universe, go forth and conquer!");
 
-            foreach (Planet planet in game.getPlanets())
+            foreach (Planet planet in game.getGame().getPlanets())
             {
                 if (planet.getOwner() == null)
                 {
-                    planet.makeHomeworld(player, game.getYear());
+                    planet.makeHomeworld(player, game.getGame().getYear());
                     player.setHomeworld(planet);
                     planet.addQueueItem(QueueItemType.AutoMine, 5);
                     planet.addQueueItem(QueueItemType.AutoFactory, 5);
@@ -81,13 +79,13 @@ public class UniverseGenerator: MonoBehaviour {
                 fleet.addShipStack(design, 1);
                 fleet.addWaypoint(player.getHomeworld().getX(), player.getHomeworld().getY(), 5, WaypointTask.None, player.getHomeworld());
                 fleet.computeAggregate();
-
-                GameObject go = GameObject.Instantiate(baseFleet, player.getHomeworld().transform, false);
+                
+                GameObject go = GameObject.Instantiate(baseFleet, player.getHomeworld().PlanetGameObject.transform, false);
                 go.transform.position = Vector3.zero;
-                go.GetComponent<Fleet>().CloneFrom(fleet);
-                fleet = go.GetComponent<Fleet>();
+                go.GetComponent<FleetGameObject>().setFleet(fleet);
                 go.name = fleet.getName();
                 go.SetActive(true);
+
 
                 if (design.getHull().isStarbase())
                 {
@@ -100,14 +98,11 @@ public class UniverseGenerator: MonoBehaviour {
                 {
                     fleet.setFuel(fleet.getAggregate().getFuelCapacity());
                     fleet.setOrbiting(player.getHomeworld());
-
-                    // set it to orbiting the homeworld
-                    player.getHomeworld().getOrbitingFleets().Add(fleet);
                 }
 
                 // add this fleet to the various arrays
                 // game.getFleets().put(fleet.getId(), fleet);
-                game.addFleet(fleet);
+                game.getGame().addFleet(fleet);
                 player.setNumFleetsBuilt(player.getNumFleetsBuilt() + 1);
             }
 
@@ -123,7 +118,7 @@ public class UniverseGenerator: MonoBehaviour {
         tg.processTurns(game);
 
         */
-        game.setStatus(GameStatus.WaitingForSubmit);
+        game.getGame().setStatus(GameStatus.WaitingForSubmit);
     }
 
 
@@ -163,13 +158,12 @@ public class UniverseGenerator: MonoBehaviour {
             planetLocs.Add(loc, true);
 
 
-            GameObject go = GameObject.Instantiate(basePlanet,
-                planetParent.transform);
+            GameObject go = GameObject.Instantiate(basePlanet,  planetParent.transform);
             Planet planet = planetController.create(ng.nextName(), (int)loc.x, (int)loc.y);
-            go.GetComponent<Planet>().clone(planet);
-            planetController.randomize(go.GetComponent<Planet>());
-            game.addPlanet(go.GetComponent<Planet>());
-            go.transform.localPosition = new Vector3(go.GetComponent<Planet>().getX() - width/2, go.GetComponent<Planet>().getY() - height/2);
+            go.GetComponent<PlanetGameObject>().setPlanet(planet);
+            planetController.randomize(go.GetComponent<PlanetGameObject>().getPlanet());
+            game.addPlanet(go.GetComponent<PlanetGameObject>().getPlanet());
+            go.transform.localPosition = new Vector3(go.GetComponent<PlanetGameObject>().getPlanet().getX() - width/2, go.GetComponent<PlanetGameObject>().getPlanet().getY() - height/2);
             go.name = planet.getName();
             go.SetActive(true);
 

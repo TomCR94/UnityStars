@@ -33,7 +33,7 @@ public class ScoutTurnProcessor : AbstractTurnProcessor {
         // find all the planets we don't know about yet
         List<Planet> unknownPlanets = new List<Planet>();
         List<Planet> buildablePlanets = new List<Planet>();
-        foreach (Planet planet in player.getGame().getPlanets())
+        foreach (Planet planet in game.getPlanets())
         {
             Debug.Log("Scanning all planets");
             if (!player.hasKnowledge(planet))
@@ -50,7 +50,7 @@ public class ScoutTurnProcessor : AbstractTurnProcessor {
 
         // get all the fleets that can scan and don't have waypoints yet
         List<Fleet> scannerFleets = new List<Fleet>();
-        foreach (Fleet fleet in player.getGame().getFleets())
+        foreach (Fleet fleet in game.getFleets())
         {
             if (fleet.getOwner().getID() == player.getID() && fleet.canScan())
             {

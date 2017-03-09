@@ -14,9 +14,19 @@ public class CargoSummary : MonoBehaviour {
 
     private void Update()
     {
-        if (Settings.instance.selected != null && Settings.instance.selected.GetComponent<Cargo>() != null)
+        if (Settings.instance.selectedFleet != null)
         {
-            cargo = Settings.instance.selected.GetComponent<Cargo>();
+            cargo = Settings.instance.selectedFleet.getCargo();
+
+            Fuel.text = "Fuel:" + cargo.getFuel();
+            Colonists.text = "Colonists: " + cargo.getColonists();
+            ironium.text = "Ironium: " + cargo.getIronium().ToString();
+            boranium.text = "Boranium: " + cargo.getBoranium().ToString();
+            germanium.text = "Germanium: " + cargo.getGermanium().ToString();
+        }
+        else if (Settings.instance.selectedPlanet != null)
+        {
+            cargo = Settings.instance.selectedPlanet.getCargo();
 
             Fuel.text = "Fuel:" + cargo.getFuel();
             Colonists.text = "Colonists: " + cargo.getColonists();

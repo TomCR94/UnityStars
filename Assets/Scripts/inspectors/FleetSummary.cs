@@ -13,9 +13,9 @@ public class FleetSummary : MonoBehaviour {
 
     private void Update()
     {
-        if (Settings.instance.selected != null && Settings.instance.selected.GetComponent<Fleet>() != null)
+        if (Settings.instance.selectedFleet != null )
         {
-            fleet = Settings.instance.selected.GetComponent<Fleet>();
+            fleet = Settings.instance.selectedFleet;
 
             name.text = "Name:" + fleet.getName();
             xy.text = "XY: " + fleet.getX() + ", " + fleet.getY();

@@ -5,7 +5,7 @@ using UnityEngine;
 public class ProductionQueue : AbstractStarsObject_NonMono {
 
     [SerializeField]
-    private Planet planet;
+    private string planetID;
 
     [SerializeField]
     private Cost allocated = new Cost();
@@ -20,7 +20,7 @@ public class ProductionQueue : AbstractStarsObject_NonMono {
 
     public ProductionQueue(Planet planet) : base()
     {
-        this.planet = planet;
+        this.planetID = planet.getID();
     }
 
     public Cost getAllocated()
@@ -45,12 +45,12 @@ public class ProductionQueue : AbstractStarsObject_NonMono {
 
     public void setPlanet(Planet planet)
     {
-        this.planet = planet;
+        this.planetID = planet.getID();
     }
 
     public Planet getPlanet()
     {
-        return planet;
+        return PlanetDictionary.instance.planetDict[planetID];
     }
 
 }

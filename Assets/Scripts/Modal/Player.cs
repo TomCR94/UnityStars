@@ -23,7 +23,7 @@ public class Player : AbstractStarsObject_NonMono {
      * The homeworld of this player
      */
     [SerializeField]
-    private Planet homeworld;
+    private string homeworldID;
 
     /**
      * The ship designs this player owns
@@ -128,8 +128,8 @@ public class Player : AbstractStarsObject_NonMono {
             // Pass the json to JsonUtility, and tell it to create a GameData object from it
             Race loadedData = JsonUtility.FromJson<Race>(dataAsJson);
             setRace(loadedData);
-            race.setPlayer(this);
-            race.setUser(getUser());
+            //race.setPlayer(this);
+            //race.setUser(getUser());
         }
     }
 
@@ -272,7 +272,7 @@ public class Player : AbstractStarsObject_NonMono {
      * Have a user 'discover' this planet, revealing it's private information as if it had been pen
      * scanned
      */
-    public void discover(Planet planet)
+    public void discover(Game game, Planet planet)
     {
         PlanetKnowledge knowledge;
         if (!planetKnowledges.ContainsKey(planet.getID()))
@@ -280,10 +280,10 @@ public class Player : AbstractStarsObject_NonMono {
             planetKnowledges.Add(planet.getID(), new PlanetKnowledge(planet));
             Message.planetDiscovered(this, planet);
         }
-        planetKnowledges.TryGetValue(planet.getID(), out knowledge);
+        knowledge = planetKnowledges[planet.getID()];
 
         // discover this planet by copying the root knowledge to the user knowledge
-        knowledge.discover(Game.instance.getYear(), planet);
+        knowledge.discover(game.getYear(), planet);
     }
 
     /**
@@ -325,8 +325,7 @@ public class Player : AbstractStarsObject_NonMono {
     {
         if (hasKnowledge(planet))
         {
-            PlanetKnowledge value;
-            planetKnowledges.TryGetValue(planet.getID(), out value);
+            PlanetKnowledge value = planetKnowledges[planet.getID()];
             return value;
         }
         return null;
@@ -350,16 +349,6 @@ public class Player : AbstractStarsObject_NonMono {
     public void setRace(Race race)
     {
         this.race = race;
-    }
-
-    public Game getGame()
-    {
-        return Game.instance;
-    }
-
-    public void setGame(Game game)
-    {
-        Game.instance = game;
     }
 
     public TechLevel getTechLevels()
@@ -464,12 +453,12 @@ public class Player : AbstractStarsObject_NonMono {
 
     public void setHomeworld(Planet homeworld)
     {
-        this.homeworld = homeworld;
+        this.homeworldID = homeworld.getID();
     }
 
     public Planet getHomeworld()
     {
-        return homeworld;
+        return PlanetDictionary.instance.planetDict[homeworldID];
     }
 
     public void setDesigns(List<ShipDesign> designs)

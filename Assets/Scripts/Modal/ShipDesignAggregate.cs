@@ -2,27 +2,39 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
 public class ShipDesignAggregate {
 
     /**
  * The engine used for doing
  */
+    [SerializeField]
     TechEngine engine;
-
+    [SerializeField]
     string engineName;
-    
+
+    [SerializeField]
     private Cost cost = new Cost();
 
+    [SerializeField]
     private int mass;
+    [SerializeField]
     private int armor;
+    [SerializeField]
     private int shield;
+    [SerializeField]
     private int cargoCapacity;
+    [SerializeField]
     private int fuelCapacity;
 
+    [SerializeField]
     private int scanRange;
+    [SerializeField]
     private int scanRangePen;
 
+    [SerializeField]
     private bool colonizer;
+    [SerializeField]
     private int spaceDock;
 
     public Cost getCost()

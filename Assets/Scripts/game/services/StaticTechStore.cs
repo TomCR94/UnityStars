@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 /**
@@ -612,6 +613,23 @@ public class StaticTechStore : MonoBehaviour, TechStore
 
             techsForCategory[techInList.getCategory()].Add(techInList);
         }
+
+        foreach (TechCategory category in Enum.GetValues(typeof(TechCategory)))
+        {
+            techsForCategory[category] = techsForCategory[category].OrderBy(t => t.getRanking()).ToList<Tech>();
+        }
+
+        // sort all the lists of techs.
+        engines = engines.OrderBy(eng => eng.getRanking()).ToList();
+        armor = armor.OrderBy(eng => eng.getRanking()).ToList();
+        shields = shields.OrderBy(eng => eng.getRanking()).ToList();
+        scanners = scanners.OrderBy(eng => eng.getRanking()).ToList();
+        torpedos = torpedos.OrderBy(eng => eng.getRanking()).ToList();
+        beamWeapons = beamWeapons.OrderBy(eng => eng.getRanking()).ToList();
+        planetaryScanners = planetaryScanners.OrderBy(eng => eng.getRanking()).ToList();
+        defenses = defenses.OrderBy(eng => eng.getRanking()).ToList();
+        hulls = hulls.OrderBy(eng => eng.getRanking()).ToList();
+        starbases = starbases.OrderBy(eng => eng.getRanking()).ToList();
     }
 
     /**

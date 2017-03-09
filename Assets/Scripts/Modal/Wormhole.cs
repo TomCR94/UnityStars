@@ -4,15 +4,9 @@ using UnityEngine;
 
 public class Wormhole : MapObject {
 
+    GameGameObject game;
     Wormhole twin;
-    Game game;
-
-    private void Start()
-    {
-        game = Game.instance;
-    }
-
-
+    
     void generateTwin()
     {
     }
@@ -22,7 +16,7 @@ public class Wormhole : MapObject {
         int x = (int)loc.x;
         int y = (int)loc.y;
 
-        List<Planet> planets = game.getPlanets();
+        List<Planet> planets = game.getGame().getPlanets();
         Dictionary<Vector2, bool> planetLocs = new Dictionary<Vector2, bool>();
 
 

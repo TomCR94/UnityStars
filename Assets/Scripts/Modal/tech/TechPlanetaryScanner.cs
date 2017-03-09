@@ -1,10 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+[System.Serializable]
 public class TechPlanetaryScanner : Tech {
-
+    [SerializeField]
     private int _scanRange;
+    [SerializeField]
     private int _scanRangePen;
 
     public TechPlanetaryScanner() : base()

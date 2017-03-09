@@ -13,8 +13,17 @@ public class NewGameInit : MonoBehaviour {
     [SerializeField]
     public Density density = Density.Sparse;
 
+    public List<Race> races = new List<Race>();
+    public List<string> playerNames = new List<string>();
+    public bool load;
+    public string gameName;
+
     private void Awake()
     {
+        Race humanoid = new Race().setHumanoid();
+        RaceEditor.writeToRaceFile(humanoid);
+        setPlayerRace(humanoid, 0);
+        setPlayerRace(humanoid, 1);
         if (FindObjectOfType<StaticTechStore>() == null)
         {
             GameObject go = new GameObject("TechStore", typeof(StaticTechStore));
@@ -32,9 +41,14 @@ public class NewGameInit : MonoBehaviour {
 		
 	}
 
-    public void loadNewGame()
+    public void loadGame()
     {
         SceneManager.LoadScene(1);
+    }
+
+    public void loadOnlineGame()
+    {
+        SceneManager.LoadScene(2);
     }
 
     public void setSize(int index)
@@ -45,5 +59,29 @@ public class NewGameInit : MonoBehaviour {
     public void setDensity(int index)
     {
         density = (Density)Enum.GetValues(typeof(Density)).GetValue(index);
+    }
+
+    public void setPlayerRace(Race race, int playerNumber)
+    {
+        if (races.Count > playerNumber)
+            races.RemoveAt(playerNumber);
+        races.Insert(playerNumber, race);
+    }
+
+    public void setPlayerName(string name, int playerNumber)
+    {
+        if (playerNames.Count > playerNumber)
+            playerNames.RemoveAt(playerNumber);
+        playerNames.Insert(playerNumber, name);
+    }
+
+    public void setGameName(string name)
+    {
+        gameName = name;
+    }
+
+    public void setLoading(bool load)
+    {
+        this.load = load;
     }
 }

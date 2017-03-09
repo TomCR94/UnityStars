@@ -17,38 +17,34 @@ public class FleetsInOrbit : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		gotoButton.interactable = cargoButton.interactable = (Settings.instance.selected != null && Settings.instance.selected.GetComponent<Planet>() != null);
+		gotoButton.interactable = cargoButton.interactable = (fleets.options.Count > 0 && Settings.instance.selectedPlanet != null);
     }
 
     public void init()
     {
 
-        if (Settings.instance.selected != null && Settings.instance.selected.GetComponent<Planet>() != null)
+        if (Settings.instance.selectedPlanet != null)
         {
             fleetNames.Clear();
             fleets.ClearOptions();
-
-            Planet planet = Settings.instance.selected.GetComponent<Planet>();
-
-            for (int i = 0; i < planet.transform.childCount; i++)
+            
+            foreach (Fleet fleet in Settings.instance.selectedPlanet.getOrbitingFleets())
             {
-                if (planet.transform.GetChild(i).GetComponent<Fleet>() != null)
-                {
-                    fleetNames.Add(planet.transform.GetChild(i).GetComponent<Fleet>().getName());
-                }
+                fleetNames.Add(fleet.getName());
             }
+            
             fleets.AddOptions(fleetNames);
         }
     }
 
     public void Goto()
     {
-        Settings.instance.selected = Settings.instance.selected.GetComponent<Planet>().transform.GetChild(fleets.value).gameObject;
+        Settings.instance.selectedFleet = Settings.instance.selectedPlanet.getOrbitingFleets()[fleets.value];
     }
 
     public void Cargo()
     {
-        CargoTransfer.instance.init(Settings.instance.selected.GetComponent<Planet>().transform.GetChild(fleets.value).GetComponent<Fleet>());
+        CargoTransfer.instance.init(Settings.instance.selectedPlanet.getOrbitingFleets()[fleets.value]);
     }
 
 }

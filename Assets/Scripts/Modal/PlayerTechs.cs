@@ -96,8 +96,7 @@ public class PlayerTechs
         {
             if (player.hasTech(tech))
             {
-                List<Tech> t;
-                techsForCategory.TryGetValue(tech.getCategory(), out t);
+                List<Tech> t = techsForCategory[tech.getCategory()];
                 t.Add(tech);
                 if (tech is TechHullComponent) {
             hullComponents.Add((TechHullComponent)tech);
@@ -107,13 +106,11 @@ public class PlayerTechs
         
         // sort the category techs
         foreach (TechCategory category in Enum.GetValues(typeof(TechCategory))) {
-            //Collections.sort(techsForCategory[category], new TechComparator<Tech>());
             //techsForCategory[category].Sort();
             techsForCategory[category] = techsForCategory[category].OrderBy(t => t.getRanking()).ToList<Tech>();
         }
         
         // sort the hull components by category and ranking
-        //Collections.sort(hullComponents, new TechCategoryRankingComparator<Tech>());
         //hullComponents.Sort();
         hullComponents = hullComponents.OrderBy(t => t.getRanking()).ToList<TechHullComponent>();
 

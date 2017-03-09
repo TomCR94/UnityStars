@@ -5,12 +5,14 @@ using UnityEngine.UI;
 using System.Linq;
 using System;
 
+[Serializable]
 public class Planet : MapObject, CargoHolder {
+
+    private PlanetGameObject planetGameObject;
 
     [SerializeField]
     private ProductionQueue queue = new ProductionQueue();
     
-    [SerializeField]
     private List<Fleet> orbitingFleets = new List<Fleet>();
 
     [SerializeField]
@@ -26,12 +28,13 @@ public class Planet : MapObject, CargoHolder {
     [SerializeField]
     private bool scanner;
 
-    [SerializeField]
     private Player owner;
 
-
     [SerializeField]
-    private Fleet starbase;
+    private string ownerID;
+    
+    [SerializeField]
+    private string starbaseID;
 
     [SerializeField]
     private Cargo cargo = new Cargo();
@@ -45,6 +48,19 @@ public class Planet : MapObject, CargoHolder {
     [SerializeField]
     private Mineral concMinerals = new Mineral();
 
+    public PlanetGameObject PlanetGameObject
+    {
+        get
+        {
+            return planetGameObject;
+        }
+
+        set
+        {
+            planetGameObject = value;
+        }
+    }
+
     public Planet() : base()
     {
         queue.setPlanet(this);
@@ -53,6 +69,11 @@ public class Planet : MapObject, CargoHolder {
     public Planet(string name, int x, int y) : base(name, x, y)
     {
         queue.setPlanet(this);
+    }
+
+    public new string getID()
+    {
+        return getName();
     }
 
     public void clone(Planet planet)
@@ -76,28 +97,9 @@ public class Planet : MapObject, CargoHolder {
 
     }
 
-    private Color[] playerColors = {Color.green, Color.red };
-
-    private void Update()
-    {
-        if (getOwner() != null)
-        {
-            for (int i = 0; i < Game.instance.getPlayers().Count; i++)
-            {
-                if (getOwner().getID() == Game.instance.getPlayers()[i].getID())
-                {
-                    GetComponent<Image>().color = playerColors[i];
-                    break;
-                }
-
-            }
-
-        }
-    }
-
     public string ToString()
     {
-        return "Planet [name=" + name + ", x=" + x + ", y=" + y + "]";
+        return "Planet [name=" + getName() + ", x=" + x + ", y=" + y + "]";
     }
 
     public int getCargoCapacity()
@@ -150,6 +152,7 @@ public class Planet : MapObject, CargoHolder {
     public void makeHomeworld(Player player, int year)
     {
         owner = player;
+        ownerID = owner.getID();
         Race race = player.getRace();
 
         System.Random random = new System.Random();
@@ -422,12 +425,24 @@ public class Planet : MapObject, CargoHolder {
 
     public void setOwner(Player owner)
     {
+        if(owner != null)
+            this.ownerID = owner.getID();
         this.owner = owner;
     }
 
     public Player getOwner()
     {
         return owner;
+    }
+
+    public void setOwnerID(string ID)
+    {
+        ownerID = ID;
+    }
+
+    public string getOwnerID()
+    {
+        return ownerID;
     }
 
     public int getPopulation()
@@ -480,11 +495,6 @@ public class Planet : MapObject, CargoHolder {
         return queue;
     }
 
-    public void setOrbitingFleets(List<Fleet> orbitingFleets)
-    {
-        this.orbitingFleets = orbitingFleets;
-    }
-
     public List<Fleet> getOrbitingFleets()
     {
         return orbitingFleets;
@@ -492,12 +502,12 @@ public class Planet : MapObject, CargoHolder {
 
     public void setStarbase(Fleet starbase)
     {
-        this.starbase = starbase;
+        this.starbaseID = starbase.getID();
     }
 
     public Fleet getStarbase()
     {
-        return starbase;
+        return FleetDictionary.instance.fleetDict[starbaseID];
     }
 
     public void setCargo(Cargo cargo)

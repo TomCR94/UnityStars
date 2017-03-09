@@ -12,9 +12,9 @@ public class PlanetSummary : MonoBehaviour {
 
     private void Update()
     {
-        if (Settings.instance.selected != null && Settings.instance.selected.GetComponent<Planet>() != null)
+        if (Settings.instance.selectedPlanet != null)
         {
-            planet = Settings.instance.selected.GetComponent<Planet>();
+            planet = Settings.instance.selectedPlanet;
 
             title.text = planet.getName() + " Summary";
             population.text = "Population: " + planet.getPopulation();

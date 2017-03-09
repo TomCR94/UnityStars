@@ -129,7 +129,6 @@ public class FleetControllerImpl : FleetController {
                 // move this fleet closer to the next waypoint
                 fleet.setX(fleet.getX() + (int)((wp1.getX() - fleet.getX()) * ((float)(dist) / (float)(totaldist))));
                 fleet.setY(fleet.getY() + (int)((wp1.getY() - fleet.getY()) * ((float)(dist) / (float)(totaldist))));
-                fleet.transform.localPosition = new Vector3(fleet.getX() - Game.instance.getWidth() / 2, fleet.getY() - Game.instance.getHeight() / 2);
 
                 
                 wp0.setX(fleet.getX());
@@ -184,12 +183,14 @@ public class FleetControllerImpl : FleetController {
     {
         Cost cost = new Cost(fleet.getAggregate().getCost());
         cost = cost.add(new Cost(fleet.getCargo().getIronium(), fleet.getCargo().getBoranium(), fleet.getCargo().getGermanium(), 0));
-        if (wp.getTarget() is Planet) {
-            Planet planet = (Planet)wp.getTarget();
+        if (wp.getTarget() is Planet)
+        {
+            Planet planet = PlanetDictionary.instance.getPlanetForID(wp.getTarget().getName());
             planet.setCargo(planet.getCargo().add(new Mineral(cost.getIronium(), cost.getBoranium(), cost.getGermanium())));
             fleet.setOrbiting(null);
             fleet.setScrapped(true);
-            GameObject.Destroy(fleet.gameObject);
+            FleetDictionary.instance.fleetDict.Remove(fleet.getID());
+            GameObject.Destroy(fleet.FleetGameObject);
         }
     }
 
@@ -201,7 +202,7 @@ public class FleetControllerImpl : FleetController {
      */
     public void colonize(Fleet fleet, Waypoint wp)
     {
-        Planet planet = (Planet)wp.getTarget();
+        Planet planet = PlanetDictionary.instance.getPlanetForID(wp.getTarget().getName());
         if (planet == null)
         {
             Message.colonizeNonPlanet(fleet.getOwner(), fleet);
