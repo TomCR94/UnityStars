@@ -4,14 +4,17 @@ using GameSparks.Core;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
 public class PopulateGames : MonoBehaviour
 {
+
+    public Button refresh;
+
     // Use this for initialization
     void Start()
     {
         GetChallengeAccepted();
-        InvokeRepeating("GetChallengeAccepted", 15, 15);
+        //InvokeRepeating("GetChallengeAccepted", 15, 15);
 
     }
 
@@ -35,6 +38,7 @@ public class PopulateGames : MonoBehaviour
 
     public void GetChallengeAccepted()
     {
+        refresh.interactable = false;
         Clear();
         //We send a ListChallenge Request with the shortcode of our challenge, we set this in our GameSparks Portal
         new ListChallengeRequest().SetShortCode("MP")
@@ -59,6 +63,7 @@ public class PopulateGames : MonoBehaviour
                         go.GetComponent<ChallengeGame>().challenger = challenge.Challenger.Name;
                         go.SetActive(true);
                     }
+                    refresh.interactable = true;
                 });
     }
 

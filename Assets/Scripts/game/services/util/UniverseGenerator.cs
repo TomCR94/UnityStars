@@ -52,7 +52,7 @@ public class UniverseGenerator: MonoBehaviour {
                     player.setHomeworld(planet);
                     planet.addQueueItem(QueueItemType.AutoMine, 5);
                     planet.addQueueItem(QueueItemType.AutoFactory, 5);
-                    player.getPlanetKnowledges().Add(planet.getID(), new PlanetKnowledge(planet));
+                    player.getPlanetKnowledges().Add(new PlanetKnowledge(planet));
                     Message.homePlanet(player, planet);
                     break;
                 }

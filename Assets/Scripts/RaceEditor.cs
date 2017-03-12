@@ -22,25 +22,6 @@ public class RaceEditor : MonoBehaviour {
         List<string> list = new List<string>();
         list.AddRange(Enum.GetNames(typeof(SpendLeftoverPointsOn)));
         spendRemainingPoints.AddOptions(list);
-
-        singleName.text = race.getName();
-        pluralName.text = race.getPluralName();
-
-        foreach (Toggle tg in predefinedRaceCharac.ActiveToggles())
-        {
-            if (tg.name == Enum.GetName(typeof(PRT), race.getPRT()))
-                tg.isOn = true;
-            else
-                tg.isOn = false;
-        }
-
-        transform.GetChild(0).gameObject.SetActive(true);
-        transform.GetChild(1).gameObject.SetActive(false);
-        transform.GetChild(2).gameObject.SetActive(false);
-        transform.GetChild(3).gameObject.SetActive(false);
-        transform.GetChild(4).gameObject.SetActive(false);
-        transform.GetChild(5).gameObject.SetActive(false);
-
     }
 
     private void Update()
@@ -150,6 +131,51 @@ public class RaceEditor : MonoBehaviour {
     public void setBiotechnologyResearchLevel(int level)
     {
         race.getResearchCost().setBiotechnology((ResearchCostLevel)level);
+    }
+
+    public void setGravMin(float i)
+    {
+        race.getHabLow().setGrav((int)i);
+    }
+
+    public void setGravMax(float i)
+    {
+        race.getHabHigh().setGrav((int)i);
+    }
+
+    public void setGravImmune(bool on)
+    {
+        race.setImmuneGrav(on);
+    }
+
+    public void setTempMin(float i)
+    {
+        race.getHabLow().setTemp((int)i);
+    }
+
+    public void setTempMax(float i)
+    {
+        race.getHabHigh().setTemp((int)i);
+    }
+
+    public void setTempImmune(bool on)
+    {
+        race.setImmuneTemp(on);
+    }
+
+    public void setRadMin(float i)
+    {
+        race.getHabLow().setRad((int)i);
+    }
+
+    public void setRadMax(float i)
+    {
+        race.getHabHigh().setRad((int)i);
+    }
+
+    public void setRadImmune(bool on)
+    {
+        race.setImmuneRad(on);
     }
 
     public void Finish()

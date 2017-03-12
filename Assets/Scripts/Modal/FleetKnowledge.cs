@@ -2,10 +2,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+[System.Serializable]
+public class FleetKnowledge : AbstractStarsObject_NonMono
+{
 
-public class FleetKnowledge : AbstractStarsObject {
-
-    
+    [SerializeField]
     private string fleetId;
 
     /**

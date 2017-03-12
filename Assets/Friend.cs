@@ -13,7 +13,7 @@ public class Friend : MonoBehaviour {
     public string friendName;
     public string userID;
     public Text nameText;
-    public Button invite, delete;
+    public Button invite;
 
 	// Use this for initialization
 	void Start () {

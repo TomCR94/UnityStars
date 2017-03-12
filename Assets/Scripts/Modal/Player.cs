@@ -36,12 +36,12 @@ public class Player : AbstractStarsObject_NonMono {
      */
     [SerializeField]
     private List<Message> messages = new List<Message>();
+    //TODO serialize knowledges
+    [SerializeField]
+    private List<FleetKnowledge> fleetKnowledges = new List<FleetKnowledge>();
 
     [SerializeField]
-    private Dictionary<string, FleetKnowledge> fleetKnowledges = new Dictionary<string, FleetKnowledge>();
-
-    [SerializeField]
-    private Dictionary<string, PlanetKnowledge> planetKnowledges = new Dictionary<string, PlanetKnowledge>();
+    private List<PlanetKnowledge> planetKnowledges = new List<PlanetKnowledge>();
 
     [SerializeField]
     private String name;
@@ -275,12 +275,12 @@ public class Player : AbstractStarsObject_NonMono {
     public void discover(Game game, Planet planet)
     {
         PlanetKnowledge knowledge;
-        if (!planetKnowledges.ContainsKey(planet.getID()))
+        if (!hasKnowledge(planet))
         {
-            planetKnowledges.Add(planet.getID(), new PlanetKnowledge(planet));
+            planetKnowledges.Add(new PlanetKnowledge(planet));
             Message.planetDiscovered(this, planet);
         }
-        knowledge = planetKnowledges[planet.getID()];
+        knowledge = getPlanetKnowledge(planet);
 
         // discover this planet by copying the root knowledge to the user knowledge
         knowledge.discover(game.getYear(), planet);
@@ -294,10 +294,9 @@ public class Player : AbstractStarsObject_NonMono {
      */
     public bool hasKnowledge(Planet planet)
     {
-        if (planetKnowledges.ContainsKey(planet.getID()))
-        {
-            return true;
-        }
+        foreach (PlanetKnowledge fk in planetKnowledges)
+            if (fk.getPlanetId() == planet.getID())
+                return true;
         return false;
     }
 
@@ -309,10 +308,9 @@ public class Player : AbstractStarsObject_NonMono {
      */
     public bool hasKnowledge(Fleet fleet)
     {
-        if (fleetKnowledges.ContainsKey(fleet.getID()))
-        {
-            return true;
-        }
+        foreach (FleetKnowledge fk in fleetKnowledges)
+            if (fk.getFleetId() == fleet.getID())
+                return true;
         return false;
     }
 
@@ -325,8 +323,20 @@ public class Player : AbstractStarsObject_NonMono {
     {
         if (hasKnowledge(planet))
         {
-            PlanetKnowledge value = planetKnowledges[planet.getID()];
-            return value;
+            foreach (PlanetKnowledge pk in planetKnowledges)
+                if (pk.getPlanetId() == planet.getID())
+                    return pk;
+        }
+        return null;
+    }
+
+    public FleetKnowledge getFleetKnowledge(Fleet fleet)
+    {
+        if (hasKnowledge(fleet))
+        {
+            foreach (FleetKnowledge pk in fleetKnowledges)
+                if (pk.getFleetId() == fleet.getID())
+                    return pk;
         }
         return null;
     }
@@ -491,22 +501,22 @@ public class Player : AbstractStarsObject_NonMono {
         return techs;
     }
 
-    public Dictionary<string, FleetKnowledge> getFleetKnowledges()
+    public List<FleetKnowledge> getFleetKnowledges()
     {
         return fleetKnowledges;
     }
 
-    public void setFleetKnowledges(Dictionary<string, FleetKnowledge> knowledges)
+    public void setFleetKnowledges(List<FleetKnowledge> knowledges)
     {
         this.fleetKnowledges = knowledges;
     }
 
-    public void setPlanetKnowledges(Dictionary<string, PlanetKnowledge> planetKnowledges)
+    public void setPlanetKnowledges(List<PlanetKnowledge> planetKnowledges)
     {
         this.planetKnowledges = planetKnowledges;
     }
 
-    public Dictionary<string, PlanetKnowledge> getPlanetKnowledges()
+    public List<PlanetKnowledge> getPlanetKnowledges()
     {
         return planetKnowledges;
     }

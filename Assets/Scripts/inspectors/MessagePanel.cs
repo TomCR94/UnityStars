@@ -68,9 +68,9 @@ public class MessagePanel : MonoBehaviour {
         if (game.getGame().getPlayers()[playerIndex].getMessages().Count > 0)
         {
             MapObject mapObject = game.getGame().getPlayers()[playerIndex].getMessages()[index].getTarget();
-            if (mapObject is Fleet)
+            if (FleetDictionary.instance.getFleetForID(mapObject.getID()) != null)
             {
-                Fleet fleet = (Fleet)mapObject;
+                Fleet fleet = FleetDictionary.instance.getFleetForID(mapObject.getID());
                 if (fleet.FleetGameObject.GetComponent<Button>() != null)
                 {
                     ensureVisable.CenterOnItem(fleet.FleetGameObject.GetComponent<Button>().image.rectTransform);
@@ -78,11 +78,11 @@ public class MessagePanel : MonoBehaviour {
                     fleet.FleetGameObject.gameObject.GetComponent<Button>().image.color = fleet.FleetGameObject.gameObject.GetComponent<Button>().colors.highlightedColor;
                 }
                 else
-                    Settings.instance.selectedFleet = (Fleet)mapObject;
+                    Settings.instance.selectedFleet = fleet;
             }
-            else if (mapObject is Planet)
+            else if (PlanetDictionary.instance.getPlanetForID(mapObject.getID()) != null)
             {
-                Planet planet = (Planet)mapObject;
+                Planet planet = PlanetDictionary.instance.getPlanetForID(mapObject.getID());
                 if (planet.PlanetGameObject.GetComponent<Button>() != null)
                 {
                     ensureVisable.CenterOnItem(planet.PlanetGameObject.GetComponent<Button>().image.rectTransform);
@@ -90,7 +90,7 @@ public class MessagePanel : MonoBehaviour {
                     planet.PlanetGameObject.gameObject.GetComponent<Button>().image.color = planet.PlanetGameObject.gameObject.GetComponent<Button>().colors.highlightedColor;
                 }
                 else
-                    Settings.instance.selectedPlanet = (Planet)mapObject;
+                    Settings.instance.selectedPlanet = planet;
             }
         }
     }

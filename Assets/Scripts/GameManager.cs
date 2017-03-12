@@ -68,7 +68,8 @@ public class GameManager : MonoBehaviour {
 
             loadGen.generate();
         }
-	}
+        Settings.instance.playerID = game.getGame().getPlayers()[0].getID();
+    }
 
     public void processTurn()
     {

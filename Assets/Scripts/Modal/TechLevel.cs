@@ -1,14 +1,21 @@
 ﻿using System;
 using UnityEngine;
 
+[System.Serializable]
 public class TechLevel {
+    [SerializeField]
     protected int _energy;
+    [SerializeField]
     protected int _weapons;
+    [SerializeField]
     protected int _propulsion;
+    [SerializeField]
     protected int _construction;
+    [SerializeField]
     protected int _electronics;
+    [SerializeField]
     protected int _biotechnology;
-
+    
     public TechLevel()
     {
     }

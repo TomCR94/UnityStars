@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
 public class Hab {
 
-
+    [SerializeField]
     private int grav;
+    [SerializeField]
     private int temp;
+    [SerializeField]
     private int rad;
 
     public Hab()

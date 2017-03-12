@@ -55,7 +55,7 @@ public class InviteCreator : MonoBehaviour {
         Debug.Log(userIds[0]);
         //we use CreateChallengeRequest with the shortcode of our challenge, we set this in our GameSparks Portal
         new CreateChallengeRequest().SetChallengeShortCode("MP")
-                .SetEndTime(DateTime.Today.AddDays(1))
+                .SetEndTime(DateTime.Today.AddYears(1))
                 .SetUsersToChallenge(userIds) //We supply the userIds of who we wish to challenge
                 .SetChallengeMessage("I've challenged you to Stars!") // We can send a message along with the invite
                 .Send((response) =>

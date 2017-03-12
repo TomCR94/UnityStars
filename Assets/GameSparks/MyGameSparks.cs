@@ -38,9 +38,9 @@ namespace GameSparks.Api.Requests{
 			return this;
 		}
 		
-		public LogEventRequest_GSD Set_cR2( string value )
+		public LogEventRequest_GSD Set_challengeInstanceId( string value )
 		{
-			request.AddString("cR2", value);
+			request.AddString("challengeInstanceId", value);
 			return this;
 		}
 	}
@@ -78,9 +78,95 @@ namespace GameSparks.Api.Requests{
 			request.AddString("cR1", value);
 			return this;
 		}
-		public LogChallengeEventRequest_GSD Set_cR2( string value )
+		public LogChallengeEventRequest_GSD Set_challengeInstanceId( string value )
+		{
+			request.AddString("challengeInstanceId", value);
+			return this;
+		}
+	}
+	
+	public class LogEventRequest_getOnlinePlayers : GSTypedRequest<LogEventRequest_getOnlinePlayers, LogEventResponse>
+	{
+	
+		protected override GSTypedResponse BuildResponse (GSObject response){
+			return new LogEventResponse (response);
+		}
+		
+		public LogEventRequest_getOnlinePlayers() : base("LogEventRequest"){
+			request.AddString("eventKey", "getOnlinePlayers");
+		}
+	}
+	
+	public class LogChallengeEventRequest_getOnlinePlayers : GSTypedRequest<LogChallengeEventRequest_getOnlinePlayers, LogChallengeEventResponse>
+	{
+		public LogChallengeEventRequest_getOnlinePlayers() : base("LogChallengeEventRequest"){
+			request.AddString("eventKey", "getOnlinePlayers");
+		}
+		
+		protected override GSTypedResponse BuildResponse (GSObject response){
+			return new LogChallengeEventResponse (response);
+		}
+		
+		/// <summary>
+		/// The challenge ID instance to target
+		/// </summary>
+		public LogChallengeEventRequest_getOnlinePlayers SetChallengeInstanceId( String challengeInstanceId )
+		{
+			request.AddString("challengeInstanceId", challengeInstanceId);
+			return this;
+		}
+	}
+	
+	public class LogEventRequest_IRD : GSTypedRequest<LogEventRequest_IRD, LogEventResponse>
+	{
+	
+		protected override GSTypedResponse BuildResponse (GSObject response){
+			return new LogEventResponse (response);
+		}
+		
+		public LogEventRequest_IRD() : base("LogEventRequest"){
+			request.AddString("eventKey", "IRD");
+		}
+		
+		public LogEventRequest_IRD Set_cR2( string value )
 		{
 			request.AddString("cR2", value);
+			return this;
+		}
+		
+		public LogEventRequest_IRD Set_challengeInstanceId( string value )
+		{
+			request.AddString("challengeInstanceId", value);
+			return this;
+		}
+	}
+	
+	public class LogChallengeEventRequest_IRD : GSTypedRequest<LogChallengeEventRequest_IRD, LogChallengeEventResponse>
+	{
+		public LogChallengeEventRequest_IRD() : base("LogChallengeEventRequest"){
+			request.AddString("eventKey", "IRD");
+		}
+		
+		protected override GSTypedResponse BuildResponse (GSObject response){
+			return new LogChallengeEventResponse (response);
+		}
+		
+		/// <summary>
+		/// The challenge ID instance to target
+		/// </summary>
+		public LogChallengeEventRequest_IRD SetChallengeInstanceId( String challengeInstanceId )
+		{
+			request.AddString("challengeInstanceId", challengeInstanceId);
+			return this;
+		}
+		public LogChallengeEventRequest_IRD Set_cR2( string value )
+		{
+			request.AddString("cR2", value);
+			return this;
+		}
+		public LogChallengeEventRequest_IRD Set_challengeInstanceId( string value )
+		{
+			request.AddString("challengeInstanceId", value);
 			return this;
 		}
 	}

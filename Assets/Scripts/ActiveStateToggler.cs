@@ -3,7 +3,9 @@ using System.Collections;
 
 public class ActiveStateToggler : MonoBehaviour {
 
+    public GameObject go;
+
 	public void ToggleActive () {
-		gameObject.SetActive (!gameObject.activeSelf);
+        go.SetActive (!go.activeSelf);
 	}
 }

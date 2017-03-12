@@ -4,13 +4,14 @@ using System.Collections;
 public class Settings : MonoBehaviour {
 
     public static Settings instance;
+    public string playerID;
     public bool setTarget = false;
     public FleetManager fleetManager;
     public Fleet selectedFleet;
     public Planet selectedPlanet;
 
 	// Use this for initialization
-	void Start () {
+	void Awake () {
         instance = this;
 	}
 	
@@ -38,6 +39,8 @@ public class Settings : MonoBehaviour {
 
     public void SetSelected(Planet obj)
     {
+        if ((obj.getOwner() != null && obj.getOwner().getID() != playerID))
+            return;
         if (!setTarget)
             selectedPlanet = obj;
         else
@@ -51,6 +54,8 @@ public class Settings : MonoBehaviour {
 
     public void SetSelected(Fleet obj)
     {
+        if (obj.getOwner().getID() != playerID)
+            return;
         if (!setTarget)
             selectedFleet = obj;
         else

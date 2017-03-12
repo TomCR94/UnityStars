@@ -107,6 +107,9 @@ public class ChallengeGame : MonoBehaviour
 
                         NewGameInit.instance.loadOnlineGame();
                     }
+
+                    GameSparksManager.getInstance().setChallengeID(challengeId);
+
                 }
             });
     }
@@ -136,7 +139,10 @@ public class ChallengeGame : MonoBehaviour
 
         byte[] bytes = www.bytes;
 
-        string path = Application.persistentDataPath + "/Game/serverFile.zip";
+        if (!(new DirectoryInfo(Application.persistentDataPath + "/Online/").Exists))
+            new DirectoryInfo(Application.persistentDataPath + "/Online/").Create();
+
+        string path = Application.persistentDataPath + "/Online/serverFile.zip";
 
         if (new FileInfo(path).Exists)
         {
@@ -145,14 +151,15 @@ public class ChallengeGame : MonoBehaviour
 
         File.WriteAllBytes(path, bytes);
 
-        if (new DirectoryInfo(Application.persistentDataPath + "/Game/serverFile").Exists)
+        if (new DirectoryInfo(Application.persistentDataPath + "/Online/serverFile").Exists)
         {
-            new DirectoryInfo(Application.persistentDataPath + "/Game/serverFile").Delete(true);
+            new DirectoryInfo(Application.persistentDataPath + "/Online/serverFile").Delete(true);
         }
 
         ZipFile zip = ZipFile.Read(path);
-        zip.ExtractAll(Application.persistentDataPath + "/Game/serverFile");
-
+        zip.Password = GameSparksManager.getInstance().getChallengeID();
+        zip.ExtractAll(Application.persistentDataPath + "/Online/serverFile");
+        
         NewGameInit.instance.setLoading(true);
         NewGameInit.instance.loadOnlineGame();
     }

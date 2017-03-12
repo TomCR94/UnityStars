@@ -3,19 +3,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlanetKnowledge : AbstractStarsObject {
+[System.Serializable]
+public class PlanetKnowledge : AbstractStarsObject_NonMono {
 
-    
+    [SerializeField]
     private string planetId;
 
     /**
      * The mineral concentration of this planet
      */
+    [SerializeField]
     private Mineral concMinerals = new Mineral();
 
     /**
      * The hab of this planet
      */
+    [SerializeField]
     private Hab hab = new Hab();
 
     /**
@@ -23,19 +26,24 @@ public class PlanetKnowledge : AbstractStarsObject {
      */
     private Player owner;
 
+    [SerializeField]
+    private string ownerID;
+
     /**
      * The population of this planet, or null if uninhabited
      */
+    [SerializeField]
     private int population;
 
     /**
      * The year this planet knowledge was reported, or null if NA
      */
+    [SerializeField]
     private int reportYear;
 
     public PlanetKnowledge()
     {
-        owner = null;
+        ownerID = "";
         population = 0;
         reportYear = -1;
     }
@@ -56,6 +64,7 @@ public class PlanetKnowledge : AbstractStarsObject {
         this.population = planet.getPopulation();
         this.hab = new Hab(planet.getHab());
         this.owner = planet.getOwner();
+        this.ownerID = planet.getOwnerID();
         this.concMinerals = new Mineral(planet.getConcMinerals());
     }
 
@@ -86,6 +95,8 @@ public class PlanetKnowledge : AbstractStarsObject {
 
     public void setOwner(Player owner)
     {
+        if (owner != null)
+            this.ownerID = owner.getID();
         this.owner = owner;
     }
 

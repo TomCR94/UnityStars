@@ -18,6 +18,7 @@ public class Spinner : MonoBehaviour {
     {
         up = transform.GetChild(0).GetComponent<Button>();
         down = transform.GetChild(1).GetComponent<Button>();
+        if(value < minValue)
         value = minValue;
         GetComponent<Text>().text = value.ToString();
     }

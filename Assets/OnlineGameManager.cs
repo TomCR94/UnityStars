@@ -80,15 +80,19 @@ public class OnlineGameManager : MonoBehaviour
                 game.getGame().getPlayers()[1].setName(NewGameInit.instance.playerNames[1]);
                 game.getGame().getPlayers()[1].getUser().setName(NewGameInit.instance.playerNames[1]);
 
-                loadGen.setUniverseGenerator(Application.persistentDataPath + "/Game/serverFile/", game.getGame(), fc, pc, new ShipDesignerImpl(), StaticTechStore.getInstance());
+                loadGen.setUniverseGenerator(Application.persistentDataPath + "/Online/serverFile/", game.getGame(), fc, pc, new ShipDesignerImpl(), StaticTechStore.getInstance());
             }
             else
-                loadGen.setUniverseGenerator(Application.persistentDataPath + "/Game/serverFile/", game.getGame(), fc, pc, new ShipDesignerImpl(), StaticTechStore.getInstance());
+                loadGen.setUniverseGenerator(Application.persistentDataPath + "/Online/serverFile/", game.getGame(), fc, pc, new ShipDesignerImpl(), StaticTechStore.getInstance());
 
             loadGen.generate();
+
+            new FileInfo(Application.persistentDataPath + "/Online/serverFile.zip").Delete();
+            new DirectoryInfo(Application.persistentDataPath + "/Online/serverFile/").Delete(true);
         }
 
         messagePanel.playerIndex = GameSparksManager.getInstance().getPlayerName() == game.getGame().getPlayers()[0].getName() ? 0 : 1;
+        Settings.instance.playerID = GameSparksManager.getInstance().getPlayerName() == game.getGame().getPlayers()[0].getName() ? game.getGame().getPlayers()[0].getID() : game.getGame().getPlayers()[1].getID();
     }
 
     public void processTurn()
@@ -109,6 +113,10 @@ public class OnlineGameManager : MonoBehaviour
 
     public void writeGameToJson()
     {
+
+        if (!(new DirectoryInfo(Application.persistentDataPath + "/Online/").Exists))
+            new DirectoryInfo(Application.persistentDataPath + "/Online/").Create();
+
         SaveGame();
         foreach (Planet planet in game.getGame().getPlanets())
             SaveGamePlanet(planet);
@@ -119,9 +127,10 @@ public class OnlineGameManager : MonoBehaviour
     public void saveGameToZip()
     {
         ZipFile zip = new ZipFile();
-        zip.AddDirectory(Application.persistentDataPath + "/Game/" + game.getGame().getName() + "/");
+        zip.AddDirectory(Application.persistentDataPath + "/Online/" + game.getGame().getName() + "/");
+        zip.Password = GameSparksManager.getInstance().getChallengeID();
         zip.SaveProgress += Zip_SaveProgress;
-        zip.Save(Application.persistentDataPath + "/Game/" + game.getGame().getName() + ".zip");
+        zip.Save(Application.persistentDataPath + "/Online/" + game.getGame().getName() + ".zip");
     }
 
     private void Zip_SaveProgress(object sender, SaveProgressEventArgs e)
@@ -145,7 +154,7 @@ public class OnlineGameManager : MonoBehaviour
         // Create a Web Form, this will be our POST method's data
         var form = new WWWForm();
         form.AddField("somefield", "somedata");
-        form.AddBinaryData("file", File.ReadAllBytes(Application.persistentDataPath + "/Game/" + game.getGame().getName() + ".zip"), game.getGame().getName() + ".zip", "application/zip");
+        form.AddBinaryData("file", File.ReadAllBytes(Application.persistentDataPath + "/Online/" + game.getGame().getName() + ".zip"), game.getGame().getName() + ".zip", "application/zip");
         //POST the screenshot to GameSparks
         WWW w = new WWW(uploadUrl, form);
         yield return w;
@@ -167,6 +176,9 @@ public class OnlineGameManager : MonoBehaviour
         Debug.Log(message.BaseData.GetString("uploadId"));
         //Save the last uploadId
         lastUploadId = message.BaseData.GetString("uploadId");
+
+        new FileInfo(Application.persistentDataPath + "/Online/" + game.getGame().getName() + ".zip").Delete();
+        new DirectoryInfo(Application.persistentDataPath + "/Online/" + game.getGame().getName()).Delete(true);
 
         takeTurn();
     }
@@ -195,7 +207,7 @@ public class OnlineGameManager : MonoBehaviour
     {
         Debug.Log(JsonUtility.ToJson(game.getGame(), true));
 
-        DirectoryInfo dirInf = new DirectoryInfo(Application.persistentDataPath + "/Game/" + game.getGame().getName() + "/");
+        DirectoryInfo dirInf = new DirectoryInfo(Application.persistentDataPath + "/Online/" + game.getGame().getName() + "/");
         if (!dirInf.Exists)
         {
             Debug.Log("Creating subdirectory");
@@ -208,21 +220,21 @@ public class OnlineGameManager : MonoBehaviour
             dirInf.Create();
         }
 
-        File.WriteAllText(Application.persistentDataPath + "/Game/" + game.getGame().getName() + "/" + game.getGame().getName() + ".json", JsonUtility.ToJson(game.getGame(), true));
+        File.WriteAllText(Application.persistentDataPath + "/Online/" + game.getGame().getName() + "/" + game.getGame().getName() + ".json", JsonUtility.ToJson(game.getGame(), true));
     }
 
     public void SaveGamePlanet(Planet planet)
     {
         Debug.Log(JsonUtility.ToJson(planet, true));
 
-        DirectoryInfo dirInf = new DirectoryInfo(Application.persistentDataPath + "/Game/" + game.getGame().getName() + "/Planets/");
+        DirectoryInfo dirInf = new DirectoryInfo(Application.persistentDataPath + "/Online/" + game.getGame().getName() + "/Planets/");
         if (!dirInf.Exists)
         {
             Debug.Log("Creating subdirectory");
             dirInf.Create();
         }
 
-        File.WriteAllText(Application.persistentDataPath + "/Game/" + game.getGame().getName() + "/Planets/" + planet.getName() + ".planet", JsonUtility.ToJson(planet, true));
+        File.WriteAllText(Application.persistentDataPath + "/Online/" + game.getGame().getName() + "/Planets/" + planet.getName() + ".planet", JsonUtility.ToJson(planet, true));
     }
 
     public void SaveGameFleet(Fleet fleet)
@@ -231,25 +243,25 @@ public class OnlineGameManager : MonoBehaviour
 
         if (fleet.getOrbiting() != null)
         {
-            DirectoryInfo dirInf = new DirectoryInfo(Application.persistentDataPath + "/Game/" + game.getGame().getName() + "/Fleets/" + fleet.getOrbiting().getName());
+            DirectoryInfo dirInf = new DirectoryInfo(Application.persistentDataPath + "/Online/" + game.getGame().getName() + "/Fleets/" + fleet.getOrbiting().getName());
             if (!dirInf.Exists)
             {
                 Debug.Log("Creating subdirectory");
                 dirInf.Create();
             }
 
-            File.WriteAllText(Application.persistentDataPath + "/Game/" + game.getGame().getName() + "/Fleets/" + fleet.getOrbiting().getName() + "/" + fleet.getName() + ".fleet", JsonUtility.ToJson(fleet, true));
+            File.WriteAllText(Application.persistentDataPath + "/Online/" + game.getGame().getName() + "/Fleets/" + fleet.getOrbiting().getName() + "/" + fleet.getID() + ".fleet", JsonUtility.ToJson(fleet, true));
         }
         else
         {
-            DirectoryInfo dirInf = new DirectoryInfo(Application.persistentDataPath + "/Game/" + game.getGame().getName() + "/Fleets/Empty Space");
+            DirectoryInfo dirInf = new DirectoryInfo(Application.persistentDataPath + "/Online/" + game.getGame().getName() + "/Fleets/Empty Space");
             if (!dirInf.Exists)
             {
                 Debug.Log("Creating subdirectory");
                 dirInf.Create();
             }
 
-            File.WriteAllText(Application.persistentDataPath + "/Game/" + game.getGame().getName() + "/Fleets/Empty Space/" + fleet.getName() + "_" + fleet.getOwner().getName() + ".fleet", JsonUtility.ToJson(fleet, true));
+            File.WriteAllText(Application.persistentDataPath + "/Online/" + game.getGame().getName() + "/Fleets/Empty Space/" + fleet.getID() + ".fleet", JsonUtility.ToJson(fleet, true));
         }
     }
 }

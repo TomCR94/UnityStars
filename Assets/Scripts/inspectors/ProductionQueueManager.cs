@@ -136,9 +136,14 @@ public class ProductionQueueManager : MonoBehaviour {
             if (productionQueueHasType(selectedPlanet.getQueue().getItems(), (QueueItemType)availibleProductionItems.value - game.getGame().getPlayers()[0].getDesigns().Count))
             {
                 selectedPlanet.getQueue().getItems()[productionQueueIndex(selectedPlanet.getQueue().getItems(), (QueueItemType)availibleProductionItems.value - game.getGame().getPlayers()[0].getDesigns().Count)].incrementQuantity();
+                currentProductionItems.value = productionQueueIndex(selectedPlanet.getQueue().getItems(), (QueueItemType)availibleProductionItems.value - game.getGame().getPlayers()[0].getDesigns().Count);
+
             }
             else
+            {
                 selectedPlanet.getQueue().getItems().Add(new ProductionQueueItem((QueueItemType)availibleProductionItems.value - game.getGame().getPlayers()[0].getDesigns().Count, 1));
+                currentProductionItems.value = currentProductionItems.options.Count - 1;
+            }
         }
         else
         {
@@ -185,7 +190,11 @@ public class ProductionQueueManager : MonoBehaviour {
         if (selectedPlanet.getQueue().getItems().Count > 0)
         {
             if (selectedPlanet.getQueue().getItems()[currentProductionItems.value].getQuantity() == 1)
+            {
                 selectedPlanet.getQueue().getItems().RemoveAt(currentProductionItems.value);
+                if (currentProductionItems.value >= currentProductionItems.options.Count)
+                    currentProductionItems.value = currentProductionItems.options.Count - 1;
+            }
             else
             {
                 ProductionQueueItem pqi = selectedPlanet.getQueue().getItems()[currentProductionItems.value];

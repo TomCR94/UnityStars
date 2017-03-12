@@ -2,13 +2,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PopulateInvites : MonoBehaviour {
+
+    public Button refresh;
 
 	// Use this for initialization
 	void Start () {
         GetChallengeInvites();
-        InvokeRepeating("GetChallengeInvites", 15, 15);
+        //InvokeRepeating("GetChallengeInvites", 15, 15);
     }
 	
 	// Update is called once per frame
@@ -28,6 +31,7 @@ public class PopulateInvites : MonoBehaviour {
 
     public void GetChallengeInvites()
     {
+        refresh.interactable = false;
         Clear();
         //We send a ListChallenge Request with the shortcode of our challenge, we set this in our GameSparks Portal
         new ListChallengeRequest().SetShortCode("MP")
@@ -50,6 +54,7 @@ public class PopulateInvites : MonoBehaviour {
                         go.GetComponent<GameInvite>().challengerRace = JsonUtility.FromJson<Race>(challenge.ScriptData.GetString("cR1"));
                         go.SetActive(true);
                     }
+                    refresh.interactable = true;
                 });
     }
 

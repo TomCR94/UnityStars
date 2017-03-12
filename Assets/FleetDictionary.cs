@@ -16,7 +16,10 @@ public class FleetDictionary : MonoBehaviour
 
     public Fleet getFleetForID(string ID)
     {
-        return fleetDict[ID];
+        if (fleetDict.ContainsKey(ID))
+            return fleetDict[ID];
+        else
+            return null;
     }
 
 

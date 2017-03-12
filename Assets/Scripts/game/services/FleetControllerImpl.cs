@@ -183,7 +183,7 @@ public class FleetControllerImpl : FleetController {
     {
         Cost cost = new Cost(fleet.getAggregate().getCost());
         cost = cost.add(new Cost(fleet.getCargo().getIronium(), fleet.getCargo().getBoranium(), fleet.getCargo().getGermanium(), 0));
-        if (wp.getTarget() is Planet)
+        if (PlanetDictionary.instance.getPlanetForID(wp.getTarget().getName()) != null)
         {
             Planet planet = PlanetDictionary.instance.getPlanetForID(wp.getTarget().getName());
             planet.setCargo(planet.getCargo().add(new Mineral(cost.getIronium(), cost.getBoranium(), cost.getGermanium())));

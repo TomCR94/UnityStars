@@ -12,12 +12,17 @@ public class LoginLogOut : MonoBehaviour {
     private string loggedInName;
     public Button logIn, logOut;
     public Text loggedIn;
+    [Space]
+    public Button Online;
     
     private void Update()
     {
         logIn.interactable = logOut.interactable = false;
 
-        if (GS.Authenticated)
+        Online.interactable = GS.Available;
+        
+
+        if (GS.Authenticated && !string.IsNullOrEmpty(GameSparksManager.getInstance().getPlayerName()))
         {
             loggedIn.text = GameSparksManager.getInstance().getPlayerName() + " is logged in";
             logIn.gameObject.SetActive(false);

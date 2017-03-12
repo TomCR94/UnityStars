@@ -223,11 +223,11 @@ public class Fleet : MapObject, CargoHolder {
     public void discover(Player player, bool pen)
     {
         FleetKnowledge knowledge;
-        if (!player.getFleetKnowledges().ContainsKey(id))
+        if (!player.hasKnowledge(this))
         {
-            player.getFleetKnowledges().Add(id, new FleetKnowledge(this));
+            player.getFleetKnowledges().Add(new FleetKnowledge(this));
         }
-        knowledge = player.getFleetKnowledges()[id];
+        knowledge = player.getFleetKnowledge(this);
 
         knowledge.discover(pen);
 

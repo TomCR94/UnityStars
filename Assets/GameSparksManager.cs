@@ -10,6 +10,8 @@ using UnityEngine.UI;
 public class GameSparksManager : MonoBehaviour
 {
 
+    public RectTransform LoginPanel, OnlinePanel;
+
     private static GameSparksManager instance = null;
     [SerializeField]
     private string playerName;
@@ -110,8 +112,8 @@ public class GameSparksManager : MonoBehaviour
                         result = response;
                         playerName = response.DisplayName;
                         playerID = response.UserId;
-                        errorText.transform.parent.parent.GetChild(1).gameObject.SetActive(true);
-                        errorText.transform.parent.gameObject.SetActive(false);
+                        LoginPanel.SetAsFirstSibling();
+                        OnlinePanel.SetSiblingIndex(6);
                         reset.Invoke();
                     }
                     else

@@ -15,7 +15,10 @@ public class PlanetDictionary : MonoBehaviour {
 
     public Planet getPlanetForID(string ID)
     {
-        return planetDict[ID];
+        if (planetDict.ContainsKey(ID))
+            return planetDict[ID];
+        else
+            return null;
     }
 
 }

@@ -7,24 +7,25 @@ using UnityEngine.UI;
 public class PopulateGameDropdown : MonoBehaviour {
     
     public List<string> gameStrings = new List<string>();
-    public Button finish;
-    // Use this for initialization
-    void Start()
-    {
-        getValues();
-    }
+    public Button load, finish;
 
     private void Update()
     {
         DirectoryInfo dirInf = new DirectoryInfo(Application.persistentDataPath + "/Game/");
-        if (dirInf.Exists)
+        if (dirInf.Exists && dirInf.GetDirectories().Length > 0)
         {
             DirectoryInfo[] dirs = dirInf.GetDirectories();
             if (dirs.Length != gameStrings.Count)
                 getValues();
+            GetComponent<Dropdown>().interactable = load.interactable = finish.interactable = true;
+        }
+        else
+        {
+            GetComponent<Dropdown>().interactable = load.interactable = finish.interactable = false;
         }
 
-        GetComponent<Dropdown>().interactable = finish.interactable = dirInf.GetDirectories().Length > 0;
+
+        
     }
 
     void getValues()

@@ -149,11 +149,10 @@ public class TurnGenerator
         // clear out the player messages
         foreach (Player player in game.getPlayers())
         {
-            foreach (Message message in player.getMessages())
-            {
-                message.setTarget(null);
-            }
+            Debug.Log("initPlayers: " + player.getName());
+            Debug.Log("messages: " + player.getMessages().Count);
             player.getMessages().Clear();
+            Debug.Log("messages Clear: " + player.getMessages().Count);
             player.getFleetKnowledges().Clear();
             player.setSubmittedTurn(false);
         }
@@ -440,7 +439,7 @@ public class TurnGenerator
             {
                 foreach (Player player in game.getPlayers())
                 {
-                    player.getFleetKnowledges().Remove(fleet.getID());
+                    player.getFleetKnowledges().Remove(new FleetKnowledge(fleet));
                     foreach (Message message in player.getMessages())
                     {
                         if (message.getTarget() != null && message.getTarget().getID() == fleet.getID())
