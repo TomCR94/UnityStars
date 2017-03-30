@@ -36,11 +36,10 @@ public class PopulateFriends : MonoBehaviour {
         lock (thisLock)
         {
             refresh.interactable = false;
-            Clear();
             new LogEventRequest_getOnlinePlayers()
                 .Send((response) =>
                 {
-
+                    Clear();
                     foreach (GSData player in response.ScriptData.GetGSDataList("players"))
                         if (player.GetString("id") != GameSparksManager.getInstance().getPlayerID())
                         {

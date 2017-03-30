@@ -90,6 +90,8 @@ public class GameManager : MonoBehaviour {
         SavePlayerTechs();
         foreach (Planet planet in game.getGame().getPlanets())
             SaveGamePlanet(planet);
+        foreach (Wormhole wormhole in game.getGame().getWormholes())
+            SaveGameWormhole(wormhole);
         foreach (Fleet fleet in game.getGame().getFleets())
             SaveGameFleet(fleet);
         layoutManager.SaveLayout();
@@ -162,6 +164,18 @@ public class GameManager : MonoBehaviour {
         }
 
         File.WriteAllText(Application.persistentDataPath + "/Game/" + game.getGame().getName() + "/Planets/" + planet.getName() + ".planet", JsonUtility.ToJson(planet, true));
+    }
+
+    public void SaveGameWormhole(Wormhole wormhole)
+    {
+
+        DirectoryInfo dirInf = new DirectoryInfo(Application.persistentDataPath + "/Game/" + game.getGame().getName() + "/Wormholes/");
+        if (!dirInf.Exists)
+        {
+            dirInf.Create();
+        }
+
+        File.WriteAllText(Application.persistentDataPath + "/Game/" + game.getGame().getName() + "/Wormholes/" + wormhole.getName() + ".wormhole", JsonUtility.ToJson(wormhole, true));
     }
 
     public void SaveGameFleet(Fleet fleet)

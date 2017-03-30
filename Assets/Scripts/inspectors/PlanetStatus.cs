@@ -26,7 +26,7 @@ public class PlanetStatus : MonoBehaviour
                 ResourcesYear.text = "Resources/Year: " + planet.getResourcesPerYearAvailable();
                 Defenses.text = "Defenses: " + planet.getDefenses() + " of " + planet.getMaxDefenses();
                 DefenseType.text = "Defense Type: " + "Surface";
-                DefCoverage.text = "Def Coverage: " + "coverage";
+                DefCoverage.text = "Def Coverage: " + ((float)planet.getDefenses() / (float)planet.getMaxDefenses() * 100) + "%";
             }
             else
             {
@@ -43,8 +43,8 @@ public class PlanetStatus : MonoBehaviour
             title.text = "Minerals On Hand";
             Population.text = "Population: ";
             ResourcesYear.text = "Resources/Year: ";
-            ScannerType.text = "Scanner Type: ";
-            ScannerRange.text = "Scanner Range: ";
+            ScannerType.text = "";
+            ScannerRange.text = "";
             Defenses.text = "Defenses: ";
             DefenseType.text = "Defense Type: ";
             DefCoverage.text = "Def Coverage: ";

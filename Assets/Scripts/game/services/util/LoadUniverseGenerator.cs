@@ -6,7 +6,7 @@ using System.IO;
 public class LoadUniverseGenerator : MonoBehaviour
 {
 
-    public GameObject basePlanet, planetParent;
+    public GameObject basePlanet, baseWormhole, planetParent;
     public GameObject baseFleet;
     public string GameLocation;
     public GameGameObject game;
@@ -37,6 +37,7 @@ public class LoadUniverseGenerator : MonoBehaviour
         planetParent.GetComponent<RectTransform>().sizeDelta = new Vector2(game.getGame().getWidth() + 40, game.getGame().getHeight() + 40);
 
         generatePlanets(game.getGame());
+        generateWormholes(game.getGame());
         generateOrbitingFleets(game.getGame());
         /*
         foreach (Player player in game.getPlayers())
@@ -242,6 +243,29 @@ public class LoadUniverseGenerator : MonoBehaviour
                 game.addPlanet(go.GetComponent<PlanetGameObject>().getPlanet());
                 go.transform.localPosition = new Vector3(go.GetComponent<PlanetGameObject>().getPlanet().getX() - width / 2, go.GetComponent<PlanetGameObject>().getPlanet().getY() - height / 2);
                 go.name = planet.getName();
+                go.SetActive(true);
+            }
+        }
+
+    }
+
+    private void generateWormholes(Game game)
+    {
+        DirectoryInfo dirInf = new DirectoryInfo(GameLocation + "/Wormholes/");
+        Debug.Log(dirInf.ToString());
+        if (dirInf.Exists)
+        {
+            FileInfo[] files = dirInf.GetFiles("*.wormhole");
+            foreach (FileInfo file in files)
+            {
+                Wormhole wormhole = JsonUtility.FromJson<Wormhole>(File.ReadAllText(file.FullName));
+                
+                GameObject go = GameObject.Instantiate(baseWormhole, planetParent.transform);
+                go.GetComponent<WormholeGameObject>().setWormhole(wormhole);
+                
+                game.addWormholes(go.GetComponent<WormholeGameObject>().getWormhole());
+                go.transform.localPosition = new Vector3(go.GetComponent<WormholeGameObject>().getWormhole().getX() - game.getWidth() / 2, go.GetComponent<WormholeGameObject>().getWormhole().getY() - game.getHeight() / 2);
+                go.name = wormhole.getName();
                 go.SetActive(true);
             }
         }

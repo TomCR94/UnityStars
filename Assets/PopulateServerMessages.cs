@@ -79,7 +79,6 @@ public class PopulateServerMessages : MonoBehaviour {
     {
         lock (thisLock)
         {
-            Clear();
             new ListMessageRequest()
                 .Send((response) =>
                 {
@@ -88,6 +87,7 @@ public class PopulateServerMessages : MonoBehaviour {
                         Debug.Log(response.Errors.JSON);
                     else
                     {
+                        Clear();
                         foreach (GSData message in response.MessageList)
                         {
                             ServerMessage sMessage = new ServerMessage();

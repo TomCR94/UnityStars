@@ -36,15 +36,15 @@ public class PopulateInvites : MonoBehaviour {
         lock (thisLock)
         {
             refresh.interactable = false;
-            Clear();
             //We send a ListChallenge Request with the shortcode of our challenge, we set this in our GameSparks Portal
             new ListChallengeRequest().SetShortCode("MP")
                     .SetState("RECEIVED") //We only want to get games that we've received
                     .SetEntryCount(50) //We want to pull in the first 50 we find
                     .Send((response) =>
                     {
-                    //For every challenge we get
-                    foreach (var challenge in response.ChallengeInstances)
+                        Clear();
+                        //For every challenge we get
+                        foreach (var challenge in response.ChallengeInstances)
                         {
                         //Create a new gameObject, add invitePrefab as a child of the invite Grid GameObject
                         GameObject go = GameObject.Instantiate(transform.GetChild(0).gameObject, transform);
