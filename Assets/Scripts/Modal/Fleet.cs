@@ -133,6 +133,8 @@ public class Fleet : MapObject, CargoHolder {
     public void computeAggregate()
     {
         aggregate = new FleetAggregate();
+        aggregate.setKillPop(0);
+        aggregate.setMinKill(0);
         aggregate.setMass(0);
         aggregate.setShield(0);
         aggregate.setCargoCapacity(0);
@@ -146,6 +148,10 @@ public class Fleet : MapObject, CargoHolder {
             // cost
             Cost cost = stack.getDesign().getAggregate().getCost().multiply(stack.getQuantity());
             aggregate.setCost(cost.add(aggregate.getCost()));
+
+            //Weapons
+            aggregate.setKillPop(aggregate.getKillPop() + stack.getDesign().getAggregate().getKillPop() * stack.getQuantity());
+            aggregate.setMinKill(aggregate.getMinKill() + stack.getDesign().getAggregate().getMinKill() * stack.getQuantity());
 
             // mass
             aggregate.setMass(aggregate.getMass() + stack.getDesign().getAggregate().getMass() * stack.getQuantity());
@@ -169,14 +175,14 @@ public class Fleet : MapObject, CargoHolder {
             }
 
             // We should only have one ship stack with spacedock capabilities, so no need to add
-            if (stack.getDesign().getAggregate().getSpaceDock() != null)
+            if (stack.getDesign().getAggregate().getSpaceDock() != 0)
             {
                 aggregate.setSpaceDock(stack.getDesign().getAggregate().getSpaceDock());
             }
 
-            if (stack.getDesign().getAggregate().getScanRange() != null)
+            if (stack.getDesign().getAggregate().getScanRange() != 0)
             {
-                if (aggregate.getScanRange() != null)
+                if (aggregate.getScanRange() != 0)
                 {
                     aggregate.setScanRange(Mathf.Max(aggregate.getScanRange(), stack.getDesign().getAggregate().getScanRange()));
                 }
@@ -186,9 +192,9 @@ public class Fleet : MapObject, CargoHolder {
                 }
             }
 
-            if (stack.getDesign().getAggregate().getScanRangePen() != null)
+            if (stack.getDesign().getAggregate().getScanRangePen() != 0)
             {
-                if (aggregate.getScanRangePen() != null)
+                if (aggregate.getScanRangePen() != 0)
                 {
                     aggregate.setScanRangePen(Mathf.Max(aggregate.getScanRangePen(), stack.getDesign().getAggregate().getScanRangePen()));
                 }
@@ -205,7 +211,7 @@ public class Fleet : MapObject, CargoHolder {
      */
     public bool canScan()
     {
-        if (aggregate.getScanRange() != null)
+        if (aggregate.getScanRange() != 0)
         {
             return true;
         }

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -107,22 +108,45 @@ public class FleetControllerImpl : FleetController {
             {
                 fleet.setX(wp1.getX());
                 fleet.setY(wp1.getY());
-                if (wp1.getTarget() != null && wp1.getTarget() is Planet) {
+                if (wp1.getTarget() != null && wp1.getTarget() is Planet)
+                {
                     Planet planet = (Planet)wp1.getTarget();
                     fleet.setOrbiting(planet);
 
                     if (wp1.getTask() == WaypointTask.Colonize)
                         colonize(fleet, wp1);
+                    else if (wp1.getTask() == WaypointTask.Bomb)
+                        Bomb(fleet);
+                    else if (wp1.getTask() == WaypointTask.Invade)
+                        Invade(fleet, wp1);
+                    else if (wp1.getTask() == WaypointTask.UnloadCargo)
+                        UnloadCargo(fleet, wp1);
+                    else if (wp1.getTask() == WaypointTask.ScrapFleet)
+                        scrap(fleet, wp1);
+                    else if (wp1.getTask() == WaypointTask.Terraform)
+                        Terraform(fleet, wp1);
+                }
+                else if (wp1.getTarget() != null && wp1.getTarget() is Wormhole)
+                {
+                    if (wp1.getTask() == WaypointTask.Stabilize)
+                        Stabilize(fleet, wp1);
+                    else
+                    {
+
+                        Wormhole wormhole = WormholeDictionary.instance.getWormholeForID(wp1.getTarget().getID());
+
+                        Wormhole twin = wormhole.getTwin();
+                        fleet.setX(twin.getX());
+                        fleet.setY(twin.getY());
+
+                        Message.Warped(fleet, fleet.getOwner(), wormhole, twin);
+                    }
                 }
 
-                // we've arrive, process this waypoint
-                /*
-                processTask(fleet, wp1);
-                fleet.getWaypoints().remove(0);
-                if (fleet.getWaypoints().size() == 1) {
+                    fleet.getWaypoints().RemoveAt(1);
+                if (fleet.getWaypoints().Count == 1) {
                     Message.fleetCompletedAssignedOrders(fleet.getOwner(), fleet);
                 }
-                */
             }
             else
             {
@@ -139,6 +163,31 @@ public class FleetControllerImpl : FleetController {
         }
     }
 
+    private void Stabilize(Fleet fleet, Waypoint wp1)
+    {
+        if (WormholeDictionary.instance.getWormholeForID(wp1.getTarget().getID()) == null)
+        {
+            Message.NotAWormHole(fleet, fleet.getOwner(), wp1.getTarget());
+            return;
+        }
+
+        if (WormholeDictionary.instance.getWormholeForID(wp1.getTarget().getID()).getStabilized())
+        {
+            Message.AlreadyStabilized(fleet, fleet.getOwner(), wp1.getTarget());
+            return;
+        }
+
+        if (fleet.getCargo().getIronium() < 10000)
+        {
+            Message.CannotAffordStabilize(fleet, fleet.getOwner(), wp1.getTarget());
+            return;
+        }
+
+        fleet.getCargo().addIronium(-10000);
+        WormholeDictionary.instance.getWormholeForID(wp1.getTarget().getID()).setStabilized(true);
+        Message.Stabilized(fleet, fleet.getOwner(), wp1.getTarget());
+    }
+
     /**
      * Process the task for a given waypoint
      * 
@@ -153,24 +202,235 @@ public class FleetControllerImpl : FleetController {
             case WaypointTask.Colonize:
                 colonize(fleet, wp);
                 break;
-            case WaypointTask.LayMineField:
-                break;
-            case WaypointTask.MergeWithFleet:
-                break;
-            case WaypointTask.Patrol:
-                break;
-            case WaypointTask.RemoteMining:
-                break;
-            case WaypointTask.Route:
+            case WaypointTask.Invade:
+                Invade(fleet, wp);
                 break;
             case WaypointTask.ScrapFleet:
                 scrap(fleet, wp);
                 break;
-            case WaypointTask.TransferFleet:
+            case WaypointTask.UnloadCargo:
+                UnloadCargo(fleet, wp);
                 break;
-            case WaypointTask.Transport:
+            case WaypointTask.Terraform:
+                Terraform(fleet, wp);
                 break;
+            case WaypointTask.Bomb:
+                Bomb(fleet);
+                break;
+            case WaypointTask.Stabilize:
+                Stabilize(fleet, wp);
+                break;
+        }
+    }
 
+    private void Terraform(Fleet fleet, Waypoint wp)
+    { 
+    }
+
+    private void Bomb(Fleet fleet)
+    {
+        if (fleet.getOrbiting() == null)
+        {
+            Message.BombInvalidTarget(fleet.getOwner(), fleet);
+            return;
+        }
+        Planet planet = fleet.getOrbiting();
+
+        if (planet.getCargo().getColonists() == 0 || planet.getStarbase() != null)
+        {
+            Message.BombNoOne(fleet.getOwner(), fleet, planet);
+            return;
+        }
+
+        // If we don't have bombers then there is nothing more to do here
+
+        if (!fleet.getAggregate().isBomber())
+        {
+            Message.BombNotBomber(fleet.getOwner(), fleet);
+            return;
+        }
+        // Bomb colonists
+        double killFactor = fleet.getAggregate().getKillPop();
+        double defenseFactor = 1.0 - planet.getDefenses()/100f;
+        double populationKill = killFactor * defenseFactor;
+        double killed = (double)planet.getCargo().getColonists() * populationKill;
+
+        double minKilled = fleet.getAggregate().getMinKill()
+                              * (1 - planet.getDefenses() / 100f);
+
+        int dead = (int)Math.Max(killed, minKilled);
+        planet.getCargo().addColonists(-dead);
+
+
+        // Get installation details
+        double totalBuildings = planet.getMines() + planet.getFactories() + planet.getDefenses();
+
+        double buildingKills = fleet.getAggregate().getKillPop() * (1 - planet.getDefenses() / 100f);
+        double damagePercent = buildingKills / totalBuildings;
+
+        if (damagePercent > 1)
+        {
+            damagePercent = 1;
+        }
+
+        // We now have the percentage of each building type to destroy (which
+        // has been clamped at a maximum of 100% (normalised so that 100% =
+        // 1). Let's apply that percentage to each building type in
+        // turn. First Defenses:
+
+        // Defenses
+        int defensesDestroyed = (int)((double)planet.getDefenses() * damagePercent);
+        planet.setDefenses(planet.getDefenses() - defensesDestroyed);
+
+        // Now Factories
+        int factoriesDestroyed = (int)(planet.getFactories() * damagePercent);
+        planet.setFactories(planet.getFactories() - factoriesDestroyed);
+
+        // Now Mines
+        int minesDestroyed = (int)(planet.getMines() * damagePercent);
+        planet.setMines(planet.getMines() - minesDestroyed);
+
+        if (planet.getCargo().getColonists() > 0)
+        {
+            Message.BombKillSome(fleet.getOwner(), fleet, planet, dead, defensesDestroyed, factoriesDestroyed, minesDestroyed);
+        }
+        else
+        {
+            Message.BombKillAll(fleet.getOwner(), fleet, planet);
+
+            // clear out the colony
+            planet.getQueue().getItems().Clear();
+            planet.setCargo(new Cargo(0, 0, 0, 0, 0));
+            planet.setOwner(null);
+        }
+    }
+
+    private void UnloadCargo(Fleet fleet, Waypoint wp)
+    {
+        if (fleet.getOrbiting() == null)
+        {
+            Message.unloadNotInOrbit(fleet.getOwner(), fleet);
+            return;
+        }
+
+        Planet targetPlanet = fleet.getOrbiting();
+        
+        Message.unloadInOrbit(fleet.getOwner(), fleet, targetPlanet);
+
+        fleet.getWaypoints().RemoveAt(0);
+
+        targetPlanet.getCargo().addIronium(fleet.getCargo().getIronium());
+        targetPlanet.getCargo().addBoranium(fleet.getCargo().getBoranium());
+        targetPlanet.getCargo().addGermanium(fleet.getCargo().getGermanium());
+
+        fleet.getCargo().setIronium(0);
+        fleet.getCargo().setBoranium(0);
+        fleet.getCargo().setGermanium(0);
+
+        // check if this is normal transportation or an invasion
+        if (fleet.getOwner().getID() != targetPlanet.getOwner().getID() && fleet.getCargo().getColonists() != 0)
+        {
+            Invade(fleet, wp);
+        }
+        else
+        {
+            targetPlanet.getCargo().addColonists(fleet.getCargo().getColonists());
+            fleet.getCargo().setColonists(0);
+        }
+
+    }
+
+    private void Invade(Fleet fleet, Waypoint wp)
+    {
+        // First check that we are actuallly in orbit around a planet.
+
+        if (fleet.getOrbiting() == null)
+        {
+            Message.InvadeNotOrbiting(fleet.getOwner(), fleet);
+            return;
+        }
+
+        // and that we have troops.
+
+        int troops = fleet.getCargo().getColonists();
+        Planet planet = fleet.getOrbiting(); ;
+
+        if (planet.getOwner() == null)
+        {
+            colonize(fleet, wp);
+        }
+
+        if (troops == 0)
+        {
+            Message.InvadeNoTroops(fleet.getOwner(), fleet, planet);
+            return;
+        }
+
+        // Consider the diplomatic situation
+        if (fleet.getOwner().getID() == planet.getOwner().getID())
+        {
+            // already own this planet, so colonists can beam down safely
+            planet.getCargo().addColonists(troops);
+            fleet.getCargo().setColonists(0);
+            Message.InvadeAlreadyOwned(fleet.getOwner(), fleet, planet);
+            return;
+        }
+
+        // check for starbase
+        if (planet.getStarbase() != null)
+        {
+            Message.InvadeStarBase(fleet.getOwner(), fleet, planet);
+            return;
+        }
+
+        // The troops are now committed to take the star or die trying
+        fleet.getCargo().setColonists(0);
+
+        // Take into account the Defenses
+        int troopsOnGround = (int)(troops * (1 - (planet.getDefenses()/100)));
+
+        // Apply defender and attacker bonuses
+        double attackerBonus = 1.1;
+        if (fleet.getOwner().getRace().getPRT() == PRT.WM)//WM
+            attackerBonus *= 1.5;
+
+        double defenderBonus = 1.0;
+        if (planet.getOwner().getRace().getPRT() == PRT.IS)//IS
+            defenderBonus *= 2.0;
+
+        int defenderStrength = (int)(planet.getCargo().getColonists() * defenderBonus);
+        int attackerStrength = (int)(troopsOnGround * attackerBonus);
+        int survivorStrength = defenderStrength - attackerStrength; // will be negative if attacker wins
+        
+        if (survivorStrength > 0)
+        {
+            // defenders win
+            int remainingDefenders = (int)(survivorStrength / defenderBonus);
+            int defendersKilled = planet.getCargo().getColonists()- remainingDefenders;
+            planet.getCargo().setColonists(remainingDefenders);
+
+            Message.InvadeAttackersSlain(fleet.getOwner(), planet, defendersKilled);
+        }
+        else if (survivorStrength < 0)
+        {
+            // attacker wins
+            planet.getQueue().getItems().Clear();
+            int remainingAttackers = (int)(-survivorStrength / attackerBonus);
+            int attackersKilled = troops - remainingAttackers;
+            planet.getCargo().setColonists(remainingAttackers);
+            planet.setOwner(fleet.getOwner());
+
+            Message.InvadeDefendersSlain(fleet.getOwner(), planet, attackersKilled);
+        }
+        else
+        {
+            // no survivors!
+            Message.InvadeDraw(fleet.getOwner(), planet);
+
+            // clear out the colony
+            planet.getQueue().getItems().Clear();
+            planet.setCargo(new Cargo(0, 0, 0, 0, 0));
+            planet.setOwner(null);
         }
     }
 
@@ -181,16 +441,19 @@ public class FleetControllerImpl : FleetController {
      */
     public void scrap(Fleet fleet, Waypoint wp)
     {
+        Debug.Log("Scrap");
         Cost cost = new Cost(fleet.getAggregate().getCost());
         cost = cost.add(new Cost(fleet.getCargo().getIronium(), fleet.getCargo().getBoranium(), fleet.getCargo().getGermanium(), 0));
+        Debug.Log("PlanetDict" + wp.getTarget().getName());
         if (PlanetDictionary.instance.getPlanetForID(wp.getTarget().getName()) != null)
         {
             Planet planet = PlanetDictionary.instance.getPlanetForID(wp.getTarget().getName());
+            Debug.Log("Planet exists " + planet.getName());
             planet.setCargo(planet.getCargo().add(new Mineral(cost.getIronium(), cost.getBoranium(), cost.getGermanium())));
             fleet.setOrbiting(null);
             fleet.setScrapped(true);
             FleetDictionary.instance.fleetDict.Remove(fleet.getID());
-            GameObject.Destroy(fleet.FleetGameObject);
+            GameObject.Destroy(fleet.FleetGameObject.gameObject);
         }
     }
 

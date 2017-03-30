@@ -108,6 +108,21 @@ public class Game : AbstractStarsObject_NonMono {
         PlanetDictionary.instance.planetDict.Remove(planet.getID());
     }
 
+    public List<Wormhole> getWormholes()
+    {
+        return WormholeDictionary.instance.WormholeDict.Values.ToList();
+    }
+
+    public void addWormholes(Wormhole wormhole)
+    {
+        WormholeDictionary.instance.WormholeDict.Add(wormhole.getID(), wormhole);
+    }
+
+    public void removeWormholes(Wormhole wormhole)
+    {
+        WormholeDictionary.instance.WormholeDict.Remove(wormhole.getID());
+    }
+
     public List<Fleet> getFleets()
     {
         return FleetDictionary.instance.fleetDict.Values.ToList();

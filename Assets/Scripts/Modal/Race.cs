@@ -110,7 +110,7 @@ public class Race : AbstractStarsObject_NonMono {
     
     public string toString()
     {
-        return string.Format("<Race: %s (%s) PRT: %s, LRTs: %s, Hab(%s -> %s immune: (%s %s %s)), rc: %s>", name, pluralName, prt, lrts, habLow, habHigh,
+        return string.Format("<Race: {0} ({1}) PRT: {3}, LRTs: {4}, Hab({5} -> {6} immune: ({7} {8} {9})), rc: {10}>", name, pluralName, prt, lrts, habLow, habHigh,
                              immuneGrav, immuneTemp, immuneRad, researchCost);
     }
 

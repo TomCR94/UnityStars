@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class UniverseGenerator: MonoBehaviour {
 
-    public GameObject basePlanet, planetParent;
+    public GameObject basePlanet, baseWormhole, planetParent;
     public GameObject baseFleet;
     public GameGameObject game;
 
@@ -28,6 +28,7 @@ public class UniverseGenerator: MonoBehaviour {
     public void generate()
     {
         generatePlanets(game.getGame());
+        generateWormholes(game.getGame());
         game.getGame().setYear(Consts.startingYear);
 
         foreach (Player player in game.getGame().getPlayers())
@@ -103,6 +104,7 @@ public class UniverseGenerator: MonoBehaviour {
                 // add this fleet to the various arrays
                 // game.getFleets().put(fleet.getId(), fleet);
                 game.getGame().addFleet(fleet);
+                player.getFleetKnowledges().Add(new FleetKnowledge(fleet));
                 player.setNumFleetsBuilt(player.getNumFleetsBuilt() + 1);
             }
 
@@ -169,6 +171,55 @@ public class UniverseGenerator: MonoBehaviour {
 
 
            // Debug.Log("Planet: " + planet.getName());
+        }
+
+    }
+
+    private void generateWormholes(Game game)
+    {
+        //game.getPlanets().Clear();
+        int width, height;
+        height = Consts.sizeToArea[game.getSize()];
+        width = height;
+
+        int numWormholes = 1;
+
+        if (game.getSize() == Size.Small)
+            numWormholes = 2;
+        else if (game.getSize() == Size.Medium)
+            numWormholes = 3;
+        else if (game.getSize() == Size.Large)
+            numWormholes = 4;
+        else if (game.getSize() == Size.Huge)
+            numWormholes = 5;
+
+        System.Random random = new System.Random();
+        Dictionary<Vector2, bool> planetLocs = new Dictionary<Vector2, bool>();
+
+        foreach (Planet planet in game.getPlanets())
+            planetLocs.Add(new Vector2(planet.getX(), planet.getY()), true);
+
+        for (int i = 0; i < numWormholes; i++)
+        {
+            Vector2 loc = new Vector2(random.Next(width), random.Next(height));
+
+            // make sure this location is ok
+            while (!isValidLocation(loc, planetLocs, Consts.planetMinDistance))
+            {
+                loc = new Vector2(random.Next(width), random.Next(height));
+            }
+
+
+            GameObject go = GameObject.Instantiate(baseWormhole, planetParent.transform);
+            Wormhole wormhole = new Wormhole("Wormhole #" + (i + 1) + "a", (int)loc.x, (int)loc.y);
+            go.GetComponent<WormholeGameObject>().setWormhole(wormhole);
+            game.addWormholes(go.GetComponent<WormholeGameObject>().getWormhole());
+            go.transform.localPosition = new Vector3(go.GetComponent<WormholeGameObject>().getWormhole().getX() - width / 2, go.GetComponent<WormholeGameObject>().getWormhole().getY() - height / 2);
+            go.name = wormhole.getName();
+            go.SetActive(true);
+
+
+            Debug.Log("Wormhole: " + wormhole.getName());
         }
 
     }

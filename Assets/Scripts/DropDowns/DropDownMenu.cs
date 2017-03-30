@@ -40,6 +40,8 @@ public class DropDownMenu : MonoBehaviour
         objects[index].transform.SetParent(UIPanel.transform);
         objects[index].transform.localPosition = Vector2.zero;
         objects[index].GetComponentInChildren<DragPanel>().enabled = true;
+        if (objects[index].GetComponentInChildren<ResizePanel>() != null)
+            objects[index].GetComponentInChildren<ResizePanel>().Open();
     }
 
     string AddSpacesToSentence(string text, bool preserveAcronyms)

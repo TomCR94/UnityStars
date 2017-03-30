@@ -36,4 +36,9 @@ public class ResizePanel : MonoBehaviour, IPointerDownHandler, IDragHandler {
 		
 		panelRectTransform.sizeDelta = sizeDelta;
 	}
+
+    public void Open()
+    { 
+        panelRectTransform.sizeDelta = minSize;
+    }
 }

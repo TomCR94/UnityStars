@@ -6,8 +6,6 @@ using UnityEngine;
 public class ShipDesignerImpl : ShipDesigner
 {
     
-    private TechStore techStore;
-
 public ShipDesign designShip(TechHull hull, Player player)
 {
     ShipDesign design = new ShipDesign(hull.getName(), hull);

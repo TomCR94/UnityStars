@@ -37,6 +37,36 @@ public class ShipDesignAggregate {
     [SerializeField]
     private int spaceDock;
 
+    [SerializeField]
+    private int killPop;
+    [SerializeField]
+    private int minKill;
+
+    public int getKillPop()
+    {
+        return killPop;
+    }
+
+    public void setKillPop(int i)
+    {
+        killPop = i;
+    }
+
+    public int getMinKill()
+    {
+        return minKill;
+    }
+
+    public void setMinKill(int i)
+    {
+        minKill = i;
+    }
+
+    public bool isBomber()
+    {
+        return (minKill + killPop) > 0;
+    }
+
     public Cost getCost()
     {
         return cost;

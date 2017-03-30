@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+[System.Serializable]
 public class TechDefence : Tech {
-
+    [SerializeField]
     private int _defenseCoverage;
 
     public TechDefence() : base()

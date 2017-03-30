@@ -27,7 +27,7 @@ public class Consts {
     public static int startingTechLevelExtra = 3;
     public static int startingTechLevelJoaT = 3;
     public static int startingTechLevelExtra_joat = 4;
-    public static int planetMinDistance = 25;
+    public static int planetMinDistance = 35;
     public static int builtInScannerJoaTMultiplier = 20;
 
     public static string[] aiNames = new string[] { "Rogue", "Phantom", "K2SO", "BB8", "C3PO", "R2D2" };

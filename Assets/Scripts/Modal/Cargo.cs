@@ -21,7 +21,7 @@ public class Cargo : Mineral {
         this.fuel = fuel;
     }
     
-    public string ToString()
+    public new string ToString()
     {
         return "Cargo [fuel=" + fuel + ", population=" + colonists + ", ironium=" + ironium + ", boranium=" + boranium + ", germanium=" + germanium + "]";
     }
@@ -44,7 +44,7 @@ public class Cargo : Mineral {
         return ironium + boranium + germanium + (colonists / 100);
     }
 
-    public int getAtIndex(int index)
+    public new int getAtIndex(int index)
     {
         if (index == 3)
         {
@@ -53,7 +53,7 @@ public class Cargo : Mineral {
         return base.getAtIndex(index);
     }
 
-    public void setAtIndex(int index, int value)
+    public new void setAtIndex(int index, int value)
     {
         if (index == 3)
         {
@@ -70,7 +70,7 @@ public class Cargo : Mineral {
         return new Cargo(ironium + cargo.getIronium(), boranium + cargo.getBoranium(), germanium + cargo.getGermanium(), colonists + cargo.getColonists(), fuel + cargo.getFuel());
     }
 
-    public Cargo add(Mineral cargo)
+    public new Cargo add(Mineral cargo)
     {
         return new Cargo(ironium + cargo.getIronium(), boranium + cargo.getBoranium(), germanium + cargo.getGermanium(), colonists, fuel);
     }

@@ -14,7 +14,7 @@ public class ScoutTurnProcessor : AbstractTurnProcessor {
     /**
      * Process the turn by firing off scout ships
      */
-    public void process()
+    public new void process()
     {
         Debug.Log("ScoutTurnProcessor");
         // find the first colony ship design
@@ -35,15 +35,12 @@ public class ScoutTurnProcessor : AbstractTurnProcessor {
         List<Planet> buildablePlanets = new List<Planet>();
         foreach (Planet planet in game.getPlanets())
         {
-            Debug.Log("Scanning all planets");
             if (!player.hasKnowledge(planet))
             {
-                Debug.Log("Found unknown planet: " + planet.getName());
                 unknownPlanets.Add(planet);
             }
             else if (scoutShip != null && isBuildablePlanet(planet, scoutShip.getAggregate().getMass()))
             {
-                Debug.Log("Found buildable planet: " + planet.getName());
                 buildablePlanets.Add(planet);
             }
         }
@@ -109,7 +106,7 @@ public class ScoutTurnProcessor : AbstractTurnProcessor {
                 {
                     isBuilding = true;
                     queuedToBeBuilt++;
-                    Debug.Log(string.Format("planet {} is already building a scout ship", planet.getName()));
+                    Debug.Log(string.Format("planet {0} is already building a scout ship", planet.getName()));
                 }
             }
 

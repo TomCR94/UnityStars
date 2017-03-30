@@ -7,7 +7,7 @@ using System;
 
 [Serializable]
 public class Planet : MapObject, CargoHolder {
-
+    [NonSerialized]
     private PlanetGameObject planetGameObject;
 
     [SerializeField]
@@ -97,7 +97,7 @@ public class Planet : MapObject, CargoHolder {
 
     }
 
-    public string ToString()
+    public new string ToString()
     {
         return "Planet [name=" + getName() + ", x=" + x + ", y=" + y + "]";
     }
@@ -507,7 +507,10 @@ public class Planet : MapObject, CargoHolder {
 
     public Fleet getStarbase()
     {
-        return FleetDictionary.instance.fleetDict[starbaseID];
+        if (string.IsNullOrEmpty(starbaseID))
+            return null;
+        else
+            return FleetDictionary.instance.getFleetForID(starbaseID);
     }
 
     public void setCargo(Cargo cargo)

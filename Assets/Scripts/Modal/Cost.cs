@@ -26,8 +26,8 @@ public class Cost : Mineral {
     {
         this.resources = resources;
     }
-    
-    public string toString()
+
+    public new string toString()
     {
         return "Cost [ironium=" + ironium + ", boranium=" + boranium + ", germanium=" + germanium + ", resources=" + resources + "]";
     }
@@ -38,7 +38,7 @@ public class Cost : Mineral {
     }
 
 
-    public int getAtIndex(int index)
+    public new int getAtIndex(int index)
     {
         if (index == 3)
         {
@@ -47,7 +47,7 @@ public class Cost : Mineral {
         return base.getAtIndex(index);
     }
 
-    public void setAtIndex(int index, int value)
+    public new void setAtIndex(int index, int value)
     {
         if (index == 3)
         {

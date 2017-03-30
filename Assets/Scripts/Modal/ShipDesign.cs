@@ -78,7 +78,7 @@ public class ShipDesign : AbstractStarsObject_NonMono
             hullComponent
             .getHullSlotType()))
         {
-            Debug.Log(string.Format("This TechHullComponent %s does not go into the slot: %s", hullComponent.getName(),
+            Debug.Log(string.Format("This TechHullComponent {0} does not go into the slot: {1}", hullComponent.getName(),
                                                                          slot.getHullSlot().getTypes()));
         }
 
@@ -110,7 +110,7 @@ public class ShipDesign : AbstractStarsObject_NonMono
         aggregate.setArmor(hull.getArmor());
         aggregate.setShield(0);
         aggregate.setCargoCapacity(0);
-        aggregate.setFuelCapacity(hull.getFuelCapacity() == null ? 0 : hull.getFuelCapacity());
+        aggregate.setFuelCapacity(hull.getFuelCapacity() == 0 ? 0 : hull.getFuelCapacity());
         aggregate.setColonizer(false);
         aggregate.setCost(hull.getCost());
         aggregate.setSpaceDock(-1);
@@ -131,22 +131,22 @@ public class ShipDesign : AbstractStarsObject_NonMono
 
                 // mass
                 aggregate.setMass(aggregate.getMass() + slot.getHullComponent().getMass() * slot.getQuantity());
-                if (slot.getHullComponent().getArmor() != null)
+                if (slot.getHullComponent().getArmor() != 0)
                 {
                     aggregate.setArmor(aggregate.getArmor() + slot.getHullComponent().getArmor() * slot.getQuantity());
                 }
                 // shield
-                if (slot.getHullComponent().getShield() != null)
+                if (slot.getHullComponent().getShield() != 0)
                 {
                     aggregate.setShield(aggregate.getShield() + slot.getHullComponent().getShield() * slot.getQuantity());
                 }
                 // cargo
-                if (slot.getHullComponent().getCargoBonus() != null)
+                if (slot.getHullComponent().getCargoBonus() != 0)
                 {
                     aggregate.setCargoCapacity(aggregate.getCargoCapacity() + slot.getHullComponent().getCargoBonus() * slot.getQuantity());
                 }
                 // fuel
-                if (slot.getHullComponent().getFuelBonus() != null)
+                if (slot.getHullComponent().getFuelBonus() != 0)
                 {
                     aggregate.setFuelCapacity(aggregate.getFuelCapacity() + slot.getHullComponent().getFuelBonus() * slot.getQuantity());
                 }
@@ -167,6 +167,10 @@ public class ShipDesign : AbstractStarsObject_NonMono
             {
                 aggregate.setCargoCapacity(aggregate.getCargoCapacity() + slot.getHullSlot().getCapacity());
             }
+            if (slot.getHullSlot().getTypes().Contains(HullSlotType.Bomb))
+            {
+                aggregate.setKillPop(aggregate.getKillPop() + slot.getHullSlot().getCapacity());
+            }
         }
         // compute the scan ranges
         computeScanRanges(owner);
@@ -179,8 +183,8 @@ public class ShipDesign : AbstractStarsObject_NonMono
      */
     private void computeScanRanges(Player owner)
     {
-        long scanRange = 0l;
-        long scanRangePen = 0l;
+        long scanRange = 0L;
+        long scanRangePen = 0L;
 
         // compute the scanner as a built in JoaT scanner if it's build in
         if (owner.getRace().getPRT() == PRT.JoaT && hull.isBuiltInScannerForJoaT())
@@ -199,21 +203,21 @@ public class ShipDesign : AbstractStarsObject_NonMono
             if (slot.getHullComponent() != null)
             {
                 // scan range of None means no scanners, 0 means bat scanner
-                if (slot.getHullComponent().getScanRange() != null)
+                if (slot.getHullComponent().getScanRange() != 0)
                 {
-                    if (scanRange == null)
+                    if (scanRange == 0)
                     {
-                        scanRange = 0l;
+                        scanRange = 0L;
                     }
                     scanRange += (long)(Mathf.Pow(slot.getHullComponent().getScanRange(), 4) * slot.getQuantity());
                 }
 
                 // scan range of None means no scanners, 0 means bat scanner
-                if (slot.getHullComponent().getScanRangePen() != null)
+                if (slot.getHullComponent().getScanRangePen() != 0)
                 {
-                    if (scanRangePen == null)
+                    if (scanRangePen == 0)
                     {
-                        scanRangePen = 0l;
+                        scanRangePen = 0L;
                     }
                     scanRangePen += (long)((Mathf.Pow(slot.getHullComponent().getScanRangePen(), 4)) * slot.getQuantity());
                 }
@@ -221,17 +225,17 @@ public class ShipDesign : AbstractStarsObject_NonMono
         }
 
         // now quad root it
-        if (scanRange != null)
+        if (scanRange != 0)
         {
             scanRange = (long)(Mathf.Pow(scanRange, 0.25f));
         }
 
-        if (scanRangePen != null)
+        if (scanRangePen != 0)
         {
             scanRangePen = (long)(Mathf.Pow(scanRangePen, 0.25f));
         }
 
-        if (scanRange != null)
+        if (scanRange != 0)
         {
             aggregate.setScanRange((int)scanRange);
         }
@@ -240,14 +244,14 @@ public class ShipDesign : AbstractStarsObject_NonMono
             aggregate.setScanRange(0);
         }
 
-        if (scanRangePen != null)
+        if (scanRangePen != 0)
         {
             aggregate.setScanRangePen((int)scanRangePen);
         }
         else
         {
             // if we have no pen scan but we have a regular scan, set the pen scan range to 0
-            if (scanRange != null)
+            if (scanRange != 0)
             {
                 aggregate.setScanRangePen(0);
             }

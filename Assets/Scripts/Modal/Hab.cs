@@ -51,7 +51,7 @@ public class Hab {
         if (grav < 50)
             result = 10000 / result;
 
-        return string.Format("%d.%02dg", result / 100, result % 100);
+        return string.Format("{0}.{1}dg", result / 100, result % 100);
     }
 
     public string tempString(int temp)
@@ -59,7 +59,7 @@ public class Hab {
         int result;
         result = (temp - 50) * 4;
 
-        return string.Format("%dC", result);
+        return string.Format("{0}C", result);
     }
 
     public string radString()

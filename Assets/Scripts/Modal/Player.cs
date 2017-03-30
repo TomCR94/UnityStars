@@ -28,8 +28,10 @@ public class Player : AbstractStarsObject_NonMono {
     /**
      * The ship designs this player owns
      */
-    [SerializeField]
     private List<ShipDesign> designs = new List<ShipDesign>();
+
+    [SerializeField]
+    private List<string> designIDs = new List<string>();
 
     /**
      * The Messages for this player
@@ -95,7 +97,6 @@ public class Player : AbstractStarsObject_NonMono {
     [SerializeField]
     private bool accepted = false;
     
-    [SerializeField]
     private PlayerTechs techs = new PlayerTechs();
 
     public Player()
@@ -458,7 +459,7 @@ public class Player : AbstractStarsObject_NonMono {
 
     public string getName()
     {
-        return name;
+        return user.getName();
     }
 
     public void setHomeworld(Planet homeworld)
@@ -479,6 +480,16 @@ public class Player : AbstractStarsObject_NonMono {
     public List<ShipDesign> getDesigns()
     {
         return designs;
+    }
+
+    public void setDesignIDs(List<string> designIDs)
+    {
+        this.designIDs = designIDs;
+    }
+
+    public List<string> getDesignIDs()
+    {
+        return designIDs;
     }
 
     public void setMessages(List<Message> messages)

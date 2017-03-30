@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine.UI;
 public class FleetManager : MonoBehaviour
 {
+    [System.NonSerialized]
     public MapObject target;
     public WaypointTask task;
     public Text fleetText;
@@ -14,11 +15,17 @@ public class FleetManager : MonoBehaviour
 
     bool isOn;
 
+    private void Start()
+    {
+        target = null;
+    }
+
     private void Update()
     {
+        add.interactable = target != null; 
         isOn = Settings.instance.selectedFleet != null;
 
-        targetButton.interactable = add.interactable = dropdown.interactable = isOn;
+        targetButton.interactable = dropdown.interactable = isOn;
 
         if (isOn)
         {
@@ -39,6 +46,8 @@ public class FleetManager : MonoBehaviour
         if (isOn)
         {
             Settings.instance.selectedFleet.addWaypoint(target.getX(), target.getY(), 5, task, target);
+            target = null;
+            dropdown.value = 0;
         }
     }
 

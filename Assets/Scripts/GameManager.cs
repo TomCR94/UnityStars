@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour {
@@ -8,6 +9,7 @@ public class GameManager : MonoBehaviour {
     public GameGameObject game;
     public GameObject baseFleet;
     public Transform mapObject;
+    public LayoutManager layoutManager;
     FleetController fc = new FleetControllerImpl();
     PlanetController pc;
     ShipDesigner sd = new ShipDesignerImpl();
@@ -69,10 +71,13 @@ public class GameManager : MonoBehaviour {
             loadGen.generate();
         }
         Settings.instance.playerID = game.getGame().getPlayers()[0].getID();
+
+        layoutManager.LoadLayout();
     }
 
     public void processTurn()
     {
+        Settings.instance.SetNoSelected();
         TurnGenerator tg = new TurnGenerator(game.getGame(), fc, pc);
         // do turn processing
         tg.generate();
@@ -81,40 +86,78 @@ public class GameManager : MonoBehaviour {
     public void writeGameToJson()
     {
         SaveGame();
+        SaveShipDesigns();
+        SavePlayerTechs();
         foreach (Planet planet in game.getGame().getPlanets())
             SaveGamePlanet(planet);
         foreach (Fleet fleet in game.getGame().getFleets())
             SaveGameFleet(fleet);
+        layoutManager.SaveLayout();
     }
 
     public void SaveGame()
     {
-        Debug.Log(JsonUtility.ToJson(game.getGame(), true));
+
+        foreach (Player player in game.getGame().getPlayers())
+            player.setDesignIDs(player.getDesigns().Select(design => design.getID()).ToList());
 
         DirectoryInfo dirInf = new DirectoryInfo(Application.persistentDataPath + "/Game/"+game.getGame().getName()+"/");
         if (!dirInf.Exists)
         {
-            Debug.Log("Creating subdirectory");
             dirInf.Create();
         }
         else
         {
             dirInf.Delete(true);
-            Debug.Log("Creating subdirectory");
             dirInf.Create();
         }
 
         File.WriteAllText(Application.persistentDataPath + "/Game/" + game.getGame().getName() + "/" + game.getGame().getName() + ".json", JsonUtility.ToJson(game.getGame(), true));
     }
 
+    public void SaveShipDesigns()
+    {
+        DirectoryInfo dirInf = new DirectoryInfo(Application.persistentDataPath + "/Game/" + game.getGame().getName() + "/ShipDesigns/");
+        if (!dirInf.Exists)
+        {
+            dirInf.Create();
+        }
+        else
+        {
+            dirInf.Delete(true);
+            dirInf.Create();
+        }
+
+        foreach (Player player in game.getGame().getPlayers())
+        {
+            foreach(ShipDesign design in player.getDesigns())
+                File.WriteAllText(Application.persistentDataPath + "/Game/" + game.getGame().getName() + "/ShipDesigns/" + design.getID() + ".design", JsonUtility.ToJson(design, true));
+        }
+    }
+
+    public void SavePlayerTechs()
+    {
+        DirectoryInfo dirInf = new DirectoryInfo(Application.persistentDataPath + "/Game/" + game.getGame().getName() + "/Techs/");
+        if (!dirInf.Exists)
+        {
+            dirInf.Create();
+        }
+        else
+        {
+            dirInf.Delete(true);
+            dirInf.Create();
+        }
+
+        foreach (Player player in game.getGame().getPlayers())
+            File.WriteAllText(Application.persistentDataPath + "/Game/" + game.getGame().getName() + "/Techs/" + player.getName() + ".techs", JsonUtility.ToJson(player.getTechs(), true));
+    }
+
     public void SaveGamePlanet(Planet planet)
     {
-        Debug.Log(JsonUtility.ToJson(planet, true));
 
         DirectoryInfo dirInf = new DirectoryInfo(Application.persistentDataPath + "/Game/" + game.getGame().getName() + "/Planets/");
         if (!dirInf.Exists)
         {
-            Debug.Log("Creating subdirectory");
             dirInf.Create();
         }
 
@@ -123,14 +166,13 @@ public class GameManager : MonoBehaviour {
 
     public void SaveGameFleet(Fleet fleet)
     {
-        Debug.Log(JsonUtility.ToJson(fleet, true));
+
 
         if (fleet.getOrbiting() != null)
         {
             DirectoryInfo dirInf = new DirectoryInfo(Application.persistentDataPath + "/Game/" + game.getGame().getName() + "/Fleets/" + fleet.getOrbiting().getName());
             if (!dirInf.Exists)
             {
-                Debug.Log("Creating subdirectory");
                 dirInf.Create();
             }
 
@@ -141,7 +183,6 @@ public class GameManager : MonoBehaviour {
             DirectoryInfo dirInf = new DirectoryInfo(Application.persistentDataPath + "/Game/" + game.getGame().getName() + "/Fleets/Empty Space");
             if (!dirInf.Exists)
             {
-                Debug.Log("Creating subdirectory");
                 dirInf.Create();
             }
 

@@ -9,11 +9,14 @@ public class Settings : MonoBehaviour {
     public FleetManager fleetManager;
     public Fleet selectedFleet;
     public Planet selectedPlanet;
+    public Wormhole selectedWormhole;
 
-	// Use this for initialization
-	void Awake () {
+    // Use this for initialization
+    void Awake () {
         instance = this;
-	}
+        selectedFleet = null;
+        selectedPlanet = null;
+    }
 	
 
     public void SetNoSelected()
@@ -35,36 +38,46 @@ public class Settings : MonoBehaviour {
 
         if (go.GetComponent<FleetGameObject>() != null)
             SetSelected(go.GetComponent<FleetGameObject>().getFleet());
+
+        if (go.GetComponent<WormholeGameObject>() != null)
+            SetSelected(go.GetComponent<WormholeGameObject>().getWormhole());
     }
 
     public void SetSelected(Planet obj)
     {
-        if ((obj.getOwner() != null && obj.getOwner().getID() != playerID))
-            return;
-        if (!setTarget)
-            selectedPlanet = obj;
-        else
+        if(setTarget)
         {
             fleetManager.target = obj;
             fleetManager.setButtonText(obj.getName());
+            setTarget = false;
+            return;
         }
+        selectedPlanet = obj;
+    }
 
-        setTarget = false;
+    public void SetSelected(Wormhole obj)
+    {
+        if (setTarget)
+        {
+            fleetManager.target = obj;
+            fleetManager.setButtonText(obj.getName());
+            setTarget = false;
+            return;
+        }
+        selectedWormhole = obj;
     }
 
     public void SetSelected(Fleet obj)
     {
-        if (obj.getOwner().getID() != playerID)
-            return;
-        if (!setTarget)
-            selectedFleet = obj;
-        else
+        if (setTarget)
         {
             fleetManager.target = obj;
             fleetManager.setButtonText(obj.getName());
+            setTarget = false;
+            return;
         }
+        selectedFleet = obj;
 
-        setTarget = false;
     }
 
     public void setTargetOn()

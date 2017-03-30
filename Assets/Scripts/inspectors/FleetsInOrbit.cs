@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class FleetsInOrbit : MonoBehaviour {
 
-
+    public GameGameObject game;
     public List<string> fleetNames = new List<string>();
     public Button gotoButton, cargoButton;
     public Dropdown fleets;
@@ -22,19 +22,29 @@ public class FleetsInOrbit : MonoBehaviour {
 
     public void init()
     {
+        fleetNames.Clear();
+        fleets.ClearOptions();
 
         if (Settings.instance.selectedPlanet != null)
         {
-            fleetNames.Clear();
-            fleets.ClearOptions();
-            
             foreach (Fleet fleet in Settings.instance.selectedPlanet.getOrbitingFleets())
             {
+                if(fleet.getOwner().getID() == game.getGame().getPlayers()[MessagePanel.instance.playerIndex].getID())
                 fleetNames.Add(fleet.getName());
             }
             
             fleets.AddOptions(fleetNames);
+            if (fleets.options.Count > 0)
+            {
+                fleets.value = 0;
+                Goto();
+            }
+            else
+            {
+                Settings.instance.selectedFleet = null;
+            }
         }
+
     }
 
     public void Goto()

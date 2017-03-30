@@ -36,7 +36,10 @@ public class Mineral {
         return "Mineral [ironium=" + ironium + ", boranium=" + boranium + ", germanium=" + germanium + "]";
     }
 
- 
+    public string toTabbedString()
+    {
+        return ironium + " " + boranium + " " + germanium;
+    }
 
     public int getAtIndex(int index)
     {

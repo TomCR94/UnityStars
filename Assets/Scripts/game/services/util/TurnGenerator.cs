@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class TurnGenerator
@@ -129,14 +130,7 @@ public class TurnGenerator
 
         // do turn processing
         processTurns(game);
-
-        /*
-         * for (Planet planet : game.getPlanets()) { dao.getPlanetDao().save(planet);
-         * dao.getProductionQueueDao().save(planet.getQueue()); }
-         * 
-         * for (Fleet fleet : game.getFleets()) { dao.getFleetDao().save(fleet); }
-         */
-
+        
         game.setStatus(GameStatus.WaitingForSubmit);
 
     }
@@ -149,10 +143,6 @@ public class TurnGenerator
         // clear out the player messages
         foreach (Player player in game.getPlayers())
         {
-            Debug.Log("initPlayers: " + player.getName());
-            Debug.Log("messages: " + player.getMessages().Count);
-            player.getMessages().Clear();
-            Debug.Log("messages Clear: " + player.getMessages().Count);
             player.getFleetKnowledges().Clear();
             player.setSubmittedTurn(false);
         }
@@ -170,11 +160,16 @@ public class TurnGenerator
      */
     private void performWaypointTasks(int index)
     {
-        List<Fleet> scrapFleets = new List<Fleet>();
-        List<Fleet> unloadFleets = new List<Fleet>();
         List<Fleet> colonizeFleets = new List<Fleet>();
-        List<Fleet> loadFleets = new List<Fleet>();
+        List<Fleet> scrapFleets = new List<Fleet>();
         List<Fleet> otherFleets = new List<Fleet>();
+
+
+        List<Fleet> invadeFleets = new List<Fleet>();
+        List<Fleet> unloadCargoFleets = new List<Fleet>();
+        List<Fleet> terraformFleets = new List<Fleet>();
+        List<Fleet> bombFleets = new List<Fleet>();
+        List<Fleet> StabilizeFleets = new List<Fleet>();
 
         foreach (Fleet fleet in game.getFleets())
         {
@@ -187,12 +182,20 @@ public class TurnGenerator
                     case WaypointTask.ScrapFleet:
                         scrapFleets.Add(fleet);
                         break;
-                    case WaypointTask.Transport:
-                        unloadFleets.Add(fleet);
-                        // loadFleets.add(fleet);
+                    case WaypointTask.Invade:
+                        invadeFleets.Add(fleet);
                         break;
-                    case WaypointTask.TransferFleet:
-                        // this occurs later
+                    case WaypointTask.UnloadCargo:
+                        unloadCargoFleets.Add(fleet);
+                        break;
+                    case WaypointTask.Terraform:
+                        terraformFleets.Add(fleet);
+                        break;
+                    case WaypointTask.Bomb:
+                        bombFleets.Add(fleet);
+                        break;
+                    case WaypointTask.Stabilize:
+                        StabilizeFleets.Add(fleet);
                         break;
                     default:
                         otherFleets.Add(fleet);
@@ -201,22 +204,37 @@ public class TurnGenerator
                 }
         }
 
-        foreach (Fleet fleet in scrapFleets)
-        {
-            fleetController.processTask(fleet, fleet.getWaypoints()[index]);
-        }
-
-        foreach (Fleet fleet in unloadFleets)
-        {
-            fleetController.processTask(fleet, fleet.getWaypoints()[index]);
-        }
-
         foreach (Fleet fleet in colonizeFleets)
         {
             fleetController.processTask(fleet, fleet.getWaypoints()[index]);
         }
 
-        foreach (Fleet fleet in loadFleets)
+        foreach (Fleet fleet in scrapFleets)
+        {
+            fleetController.processTask(fleet, fleet.getWaypoints()[index]);
+        }
+
+        foreach (Fleet fleet in invadeFleets)
+        {
+            fleetController.processTask(fleet, fleet.getWaypoints()[index]);
+        }
+
+        foreach (Fleet fleet in unloadCargoFleets)
+        {
+            fleetController.processTask(fleet, fleet.getWaypoints()[index]);
+        }
+
+        foreach (Fleet fleet in terraformFleets)
+        {
+            fleetController.processTask(fleet, fleet.getWaypoints()[index]);
+        }
+
+        foreach (Fleet fleet in bombFleets)
+        {
+            fleetController.processTask(fleet, fleet.getWaypoints()[index]);
+        }
+
+        foreach (Fleet fleet in StabilizeFleets)
         {
             fleetController.processTask(fleet, fleet.getWaypoints()[index]);
         }
@@ -259,8 +277,88 @@ public class TurnGenerator
 
     private void updateWormholeEntryPoints()
     {
-        // TODO Auto-generated method stub
+        Dictionary<Vector2, bool> planetLocs = new Dictionary<Vector2, bool>();
 
+        foreach (Planet planet in game.getPlanets())
+            planetLocs.Add(new Vector2(planet.getX(), planet.getY()), true);
+
+        foreach (Wormhole wh in WormholeDictionary.instance.WormholeDict.Values.ToList())
+        {
+            if (wh.getStabilized())
+                break;
+            Debug.Log("Moving Wormhole" + wh.getName());
+            int amountX = Random.Range(-50, 50);
+            int amountY = Random.Range(-50, 50);
+
+
+            while (!(wh.getX() + amountX < game.getWidth()) && !( wh.getX() + amountX > 0))
+                amountX = Random.Range(-50, 50);
+            while (!(wh.getY() + amountY < game.getHeight()) && !(wh.getY() + amountY > 0))
+                amountY = Random.Range(-50, 50);
+            if (isValidLocation(new Vector2(wh.getX() + amountX, wh.getY() + amountY), planetLocs, Consts.planetMinDistance))
+            {
+                wh.setX(wh.getX() + amountX);
+                wh.setY(wh.getY() + amountY);
+            }
+
+            wh.WormholeGameObject.transform.localPosition = new Vector3(wh.getX() - game.getWidth() / 2, wh.getY() - game.getHeight() / 2);
+        }
+
+        foreach (Fleet fl in FleetDictionary.instance.fleetDict.Values.ToList())
+        {
+            foreach (Waypoint wp in fl.getWaypoints())
+            {
+                if (wp.getTarget() != null && WormholeDictionary.instance.WormholeDict.ContainsKey(wp.getTarget().getID()))
+                {
+                    wp.setX(WormholeDictionary.instance.WormholeDict[wp.getTarget().getID()].getX());
+                    wp.setY(WormholeDictionary.instance.WormholeDict[wp.getTarget().getID()].getY());
+                }
+            }
+        }
+
+    }
+
+    /**
+     * Return true if the location is not already in (or close to another planet) planet_locs
+     * 
+     * @param loc The location to check
+     * @param planetLocs The locations of every planet so far
+     * @param offset The offset to check for
+     * @return True if this location (or near it) is not already in use
+     */
+    private static bool isValidLocation(Vector2 loc, Dictionary<Vector2, bool> planetLocs, int offset)
+    {
+        int x = (int)loc.x;
+        int y = (int)loc.y;
+        if (planetLocs.ContainsKey(loc))
+        {
+            return false;
+        }
+
+        for (int yOffset = 0; yOffset < offset; yOffset++)
+        {
+            for (int xOffset = 0; xOffset < offset; xOffset++)
+            {
+                if (planetLocs.ContainsKey(new Vector2(x + xOffset, y + yOffset)))
+                {
+                    return false;
+                }
+                if (planetLocs.ContainsKey(new Vector2(x - xOffset, y + yOffset)))
+                {
+                    return false;
+                }
+                if (planetLocs.ContainsKey(new Vector2(x - xOffset, y - yOffset)))
+                {
+                    return false;
+                }
+                if (planetLocs.ContainsKey(new Vector2(x + xOffset, y - yOffset)))
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     private void growISFleets()

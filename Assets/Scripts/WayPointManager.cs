@@ -42,7 +42,7 @@ public class WayPointManager : MonoBehaviour {
 
     }
 
-    void clear()
+    public void clear()
     {
         for (int i = 0; i < contentPanel.transform.childCount; i++)
         {

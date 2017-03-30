@@ -145,7 +145,56 @@ public class LoadUniverseGenerator : MonoBehaviour
             foreach (FileInfo file in files)
                 Debug.Log("File fount: " + file.Name);
             game.setGame(JsonUtility.FromJson<Game>(File.ReadAllText(files[0].FullName)));
+            getShipDesigns();
+            getPlayerTechs();
+        }
+    }
 
+    private void getShipDesigns()
+    {
+        DirectoryInfo dirInf = new DirectoryInfo(GameLocation + "/ShipDesigns/");
+        Debug.Log(dirInf.ToString());
+        if (dirInf.Exists)
+        {
+            FileInfo[] files = dirInf.GetFiles("*.design");
+            foreach (FileInfo file in files)
+            {
+                Debug.Log(file.FullName);
+                ShipDesign design = JsonUtility.FromJson<ShipDesign>(File.ReadAllText(file.FullName));
+
+                foreach (Player player in game.getGame().getPlayers())
+                {
+                    if (player.getDesignIDs().Contains(design.getID()))
+                    {
+                        Debug.Log("Giving " + player.getName() + " design of " + design.getID());
+                        player.getDesigns().Add(design);
+                    }
+                }
+            }
+        }
+    }
+
+    private void getPlayerTechs()
+    {
+        DirectoryInfo dirInf = new DirectoryInfo(GameLocation + "/Techs/");
+        Debug.Log(dirInf.ToString());
+        if (dirInf.Exists)
+        {
+            FileInfo[] files = dirInf.GetFiles("*.techs");
+            foreach (FileInfo file in files)
+            {
+                Debug.Log(file.FullName);
+                PlayerTechs techs = JsonUtility.FromJson<PlayerTechs>(File.ReadAllText(file.FullName));
+
+                foreach (Player player in game.getGame().getPlayers())
+                {
+                    if (file.Name.Contains(player.getName()))
+                    {
+                        Debug.Log("Giving " + player.getName() + " techs");
+                        player.setTechs(techs);
+                    }
+                }
+            }
         }
     }
 

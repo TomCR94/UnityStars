@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 [System.Serializable]
@@ -140,10 +141,129 @@ public class Message : AbstractStarsObject_NonMono {
         player.getMessages().Add(new Message(MessageType.PlanetDiscovery, text, planet));
     }
 
+    internal static void Warped(Fleet fleet, Player player, Wormhole wormhole, Wormhole twin)
+    {
+        string text = string.Format("{0} has warped from {1} to {2}", fleet.getName(), wormhole.getName(), twin.getName());
+        player.getMessages().Add(new Message(MessageType.Info, text, fleet));
+    }
+
     public static void fleetCompletedAssignedOrders(Player player, Fleet fleet)
     {
         string text = string.Format("{0} has completed its assigned orders", fleet.getName());
         player.getMessages().Add(new Message(MessageType.FleetOrdersComplete, text, fleet));
+    }
+
+    public static void unloadNotInOrbit(Player player, Fleet fleet)
+    {
+        string text = string.Format("{0} attempted to unload cargo while not in orbit.", fleet.getName());
+        player.getMessages().Add(new Message(MessageType.Info, text, fleet));
+    }
+
+    public static void unloadInOrbit(Player player, Fleet fleet, Planet target)
+    {
+        string text = string.Format("{0} has unloaded its cargo at {1}.", fleet.getName(), target.getName());
+        player.getMessages().Add(new Message(MessageType.Info, text, fleet));
+    }
+
+    public static void InvadeNotOrbiting(Player player, Fleet fleet)
+    {
+        string text = string.Format("{0} has orders to invade but the waypoint is not a planet.", fleet.getName());
+        player.getMessages().Add(new Message(MessageType.Info, text, fleet));
+    }
+
+    public static void NotAWormHole(Fleet fleet, Player player, MapObject mapObject)
+    {
+        string text = string.Format("{0} has waypoint orders to stabilize {1} but it is not a wormhole.", fleet.getName(), mapObject.getName());
+        player.getMessages().Add(new Message(MessageType.Info, text, fleet));
+    }
+
+    public static void AlreadyStabilized(Fleet fleet, Player player, MapObject mapObject)
+    {
+        string text = string.Format("{0} has waypoint orders to stabilize {1} but it is already stabilized.", fleet.getName(), mapObject.getName());
+        player.getMessages().Add(new Message(MessageType.Info, text, fleet));
+    }
+
+    public static void Stabilized(Fleet fleet, Player player, MapObject mapObject)
+    {
+        string text = string.Format("{0} has stabilized {1}.", fleet.getName(), mapObject.getName());
+        player.getMessages().Add(new Message(MessageType.Info, text, fleet));
+    }
+
+    public static void CannotAffordStabilize(Fleet fleet, Player player, MapObject mapObject)
+    {
+        string text = string.Format("{0} cannot stabilize {1} as it does not have the required 10000 Ironium.", fleet.getName(), mapObject.getName());
+        player.getMessages().Add(new Message(MessageType.Info, text, fleet));
+    }
+
+    public static void InvadeNoTroops(Player player, Fleet fleet, Planet target)
+    {
+        string text = string.Format("{0} has waypoint orders to invade {1} but there are no troops on board.", fleet.getName(), target.getName());
+        player.getMessages().Add(new Message(MessageType.Info, text, fleet));
+    }
+
+    public static void InvadeAlreadyOwned(Player player, Fleet fleet, Planet target)
+    {
+        string text = string.Format("{0} has waypoint orders to invade {1} but it is already ours. Troops have joined the local populace.", fleet.getName(), target.getName());
+        player.getMessages().Add(new Message(MessageType.Info, text, fleet));
+    }
+
+    public static void InvadeStarBase(Player player, Fleet fleet, Planet target)
+    {
+        string text = string.Format("{0} has waypoint orders to invade {1} but the starbase at {1} would kill all invading troops. Order has been cancelled.", fleet.getName(), target.getName());
+        player.getMessages().Add(new Message(MessageType.Info, text, fleet));
+    }
+
+    public static void InvadeAttackersSlain(Player player, Planet target, int defendersKilled)
+    {
+        string text = string.Format("The attackers were slain but {0} colonists were killed in the attack.", defendersKilled);
+        player.getMessages().Add(new Message(MessageType.Info, text, target));
+        target.getOwner().getMessages().Add(new Message(MessageType.Info, text, target));
+    }
+
+    public static void InvadeDefendersSlain(Player player, Planet target, int attackersKilled)
+    {
+        string text = string.Format("The defenders were slain but {0} troops were killed in the attack.", attackersKilled);
+        player.getMessages().Add(new Message(MessageType.Info, text, target));
+        target.getOwner().getMessages().Add(new Message(MessageType.Info, text, target));
+    }
+
+    public static void InvadeDraw(Player player, Planet target)
+    {
+        string text = string.Format("Both sides fought to the last and none were left to claim {0}!", target.getName());
+        player.getMessages().Add(new Message(MessageType.Info, text, target));
+        target.getOwner().getMessages().Add(new Message(MessageType.Info, text, target));
+    }
+
+    public static void BombInvalidTarget(Player player, Fleet fleet)
+    {
+        string text = string.Format("Fleet {0} cannot bomb as it is not targeting a planet", fleet.getName());
+        player.getMessages().Add(new Message(MessageType.Info, text, fleet));
+    }
+
+    public static void BombNotBomber(Player player, Fleet fleet)
+    {
+        string text = string.Format("Fleet {0} cannot bomb as it is not a bomber", fleet.getName());
+        player.getMessages().Add(new Message(MessageType.Info, text, fleet));
+    }
+
+    public static void BombNoOne(Player player, Fleet fleet, Planet target)
+    {
+        string text = string.Format("Fleet {0} cannot bomb {1} as there are no colonists or there is a Space Station protecting it", fleet.getName(), target.getName());
+        player.getMessages().Add(new Message(MessageType.Info, text, fleet));
+    }
+
+    public static void BombKillAll(Player player, Fleet fleet, Planet target)
+    {
+        string text = string.Format("Fleet {0} has bombed {1} killing all of the colonists", fleet.getName(), target.getName());
+        player.getMessages().Add(new Message(MessageType.Info, text));
+        player.getMessages().Add(new Message(MessageType.Info, text, fleet));
+    }
+
+    public static void BombKillSome(Player player, Fleet fleet, Planet target, int colonists, int defences, int factories, int mines)
+    {
+        string text = string.Format("Fleet {0} has bombed {1} killing {2} of the colonists and destroying {3} defenses, {4} factories, and {5} mines.", fleet.getName(), target.getName(), colonists, defences, factories, mines);
+        player.getMessages().Add(new Message(MessageType.Info, text));
+        player.getMessages().Add(new Message(MessageType.Info, text, fleet));
     }
 
     public MessageType getType()

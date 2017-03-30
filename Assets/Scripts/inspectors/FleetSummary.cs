@@ -7,7 +7,7 @@ public class FleetSummary : MonoBehaviour {
 
     public Fleet fleet;
 
-    public Text name;
+    public new Text name;
     public Text xy;
     public Text planet;
 

@@ -1,28 +1,102 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-
+[System.Serializable]
 public class Wormhole : MapObject {
 
-    GameGameObject game;
-    Wormhole twin;
-    
-    void generateTwin()
+    [NonSerialized]
+    private WormholeGameObject wormholeGameObject;
+    public WormholeGameObject WormholeGameObject
+    {
+        get
+        {
+            return wormholeGameObject;
+        }
+
+        set
+        {
+            wormholeGameObject = value;
+        }
+    }
+    [SerializeField]
+    string twinID;
+    [SerializeField]
+    bool stabiized;
+
+    public Wormhole(string name, int x, int y) : base(name, x, y)
     {
     }
 
-    private bool isValidLocation(Vector2 loc, int offset)
+    public Wormhole getTwin()
+    {
+        if (twinID == null)
+            generateTwin();
+
+        return WormholeDictionary.instance.getWormholeForID(twinID);
+    }
+
+    public void setStabilized(bool stab)
+    {
+        stabiized = stab;
+    }
+
+    public bool getStabilized()
+    {
+        return stabiized;
+    }
+
+    void generateTwin()
+    {
+        //game.getPlanets().Clear();
+        int width, height;
+        height = Consts.sizeToArea[GameGameObject.instance.game.getSize()];
+        width = height;
+
+        
+        System.Random random = new System.Random();
+        Dictionary<Vector2, bool> planetLocs = new Dictionary<Vector2, bool>();
+
+        foreach (Planet planet in GameGameObject.instance.game.getPlanets())
+            planetLocs.Add(new Vector2(planet.getX(), planet.getY()), true);
+
+        
+        Vector2 loc = new Vector2(random.Next(width), random.Next(height));
+
+        // make sure this location is ok
+        while (!isValidLocation(loc, planetLocs, Consts.planetMinDistance))
+        {
+            loc = new Vector2(random.Next(width), random.Next(height));
+        }
+
+
+        GameObject go = GameObject.Instantiate(WormholeGameObject.gameObject, WormholeGameObject.gameObject.transform.parent);
+        Wormhole wormhole = new Wormhole(getName().Replace('a', 'b'), (int)loc.x, (int)loc.y);
+        go.GetComponent<WormholeGameObject>().setWormhole(wormhole);
+        go.GetComponent<WormholeGameObject>().getWormhole().twinID = getID();
+        twinID = go.GetComponent<WormholeGameObject>().getWormhole().getID();
+        GameGameObject.instance.game.addWormholes(go.GetComponent<WormholeGameObject>().getWormhole());
+        go.transform.localPosition = new Vector3(go.GetComponent<WormholeGameObject>().getWormhole().getX() - width / 2, go.GetComponent<WormholeGameObject>().getWormhole().getY() - height / 2);
+        go.name = wormhole.getName();
+        go.SetActive(true);
+        go.transform.SetAsFirstSibling();
+
+
+        Debug.Log("Wormhole: " + wormhole.getName());
+
+    }
+
+    /**
+     * Return true if the location is not already in (or close to another planet) planet_locs
+     * 
+     * @param loc The location to check
+     * @param planetLocs The locations of every planet so far
+     * @param offset The offset to check for
+     * @return True if this location (or near it) is not already in use
+     */
+    private static bool isValidLocation(Vector2 loc, Dictionary<Vector2, bool> planetLocs, int offset)
     {
         int x = (int)loc.x;
         int y = (int)loc.y;
-
-        List<Planet> planets = game.getGame().getPlanets();
-        Dictionary<Vector2, bool> planetLocs = new Dictionary<Vector2, bool>();
-
-
-        foreach(Planet p in planets)
-            planetLocs.Add(new Vector2(p.getX(), p.getY()), true);
-
         if (planetLocs.ContainsKey(loc))
         {
             return false;

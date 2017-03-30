@@ -30,7 +30,7 @@ public class TechLevel {
         this._biotechnology = biotechnology;
     }
 
-    public string ToString()
+    public new string ToString()
     {
         return "TechLevel [energy=" + _energy + ", weapons=" + _weapons + ", propulsion=" + _propulsion + ", construction=" + _construction + ", electronics="
                + _electronics + ", biotechnology=" + _biotechnology + "]";

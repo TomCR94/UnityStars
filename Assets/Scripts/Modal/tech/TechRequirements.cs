@@ -94,37 +94,37 @@ public class TechRequirements : TechLevel {
         return this;
     }
 
-    public TechRequirements energy(int energy)
+    public new TechRequirements energy(int energy)
     {
         this._energy = energy;
         return this;
     }
 
-    public TechRequirements weapons(int weapons)
+    public new TechRequirements weapons(int weapons)
     {
         this._weapons = weapons;
         return this;
     }
 
-    public TechRequirements propulsion(int propulsion)
+    public new TechRequirements propulsion(int propulsion)
     {
         this._propulsion = propulsion;
         return this;
     }
 
-    public TechRequirements construction(int construction)
+    public new TechRequirements construction(int construction)
     {
         this._construction = construction;
         return this;
     }
 
-    public TechRequirements electronics(int electronics)
+    public new TechRequirements electronics(int electronics)
     {
         this._electronics = electronics;
         return this;
     }
 
-    public TechRequirements biotechnology(int biotechnology)
+    public new TechRequirements biotechnology(int biotechnology)
     {
         this._biotechnology = biotechnology;
         return this;

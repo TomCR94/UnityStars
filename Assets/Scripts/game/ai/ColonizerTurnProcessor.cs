@@ -61,7 +61,7 @@ public class ColonizerTurnProcessor : AbstractTurnProcessor
     /**
      * Process the turn by firing off scout ships
      */
-    public void process()
+    public new void process()
     {
 
         // find all the planets we don't know about yet
@@ -104,7 +104,7 @@ public class ColonizerTurnProcessor : AbstractTurnProcessor
         }
         if (target == null)
         {
-            Debug.Log(string.Format("Found a colonizer {} going to a destination with no target!", fleet.getName()));
+            Debug.Log(string.Format("Found a colonizer {0} going to a destination with no target!", fleet.getName()));
         }
     }
 
@@ -115,7 +115,7 @@ public class ColonizerTurnProcessor : AbstractTurnProcessor
         foreach (Fleet fleet in colonizerFleets) {
             Planet planetToColonize = closestPlanet(fleet, colonizablePlanets);
             if (planetToColonize != null) {
-                Debug.Log(string.Format("{} is targeting {} for colonizing", fleet, planetToColonize));
+                Debug.Log(string.Format("{0} is targeting {1} for colonizing", fleet.getName(), planetToColonize.getName()));
                 
                 // fill the fleet with cargo
                 fleet.getCargo().setColonists(fleet.getAggregate().getCargoCapacity());
@@ -166,7 +166,7 @@ public class ColonizerTurnProcessor : AbstractTurnProcessor
                 {
                     isBuilding = true;
                     queuedToBeBuilt++;
-                    Debug.Log(string.Format("planet {} is already buildinga colony ship", planet.getName()));
+                    Debug.Log(string.Format("planet {0} is already building a colony ship", planet.getName()));
                 }
             }
 

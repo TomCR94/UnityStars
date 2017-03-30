@@ -5,6 +5,7 @@ using UnityEngine.UI;
 public class PlanetStatus : MonoBehaviour
 {
 
+    public GameGameObject game;
     public Planet planet;
 
     public Text title;
@@ -18,14 +19,24 @@ public class PlanetStatus : MonoBehaviour
         {
             planet = Settings.instance.selectedPlanet;
 
-            title.text = "Minerals On Hand";
-            Population.text = "Population: " + planet.getPopulation();
-            ResourcesYear.text = "Resources/Year: " + planet.getResourcesPerYearAvailable();
-            //ScannerType.text = "Scanner Type: " + planet.getOwner()!= null?planet.getOwner().getTechs().getBestPlanetaryScanner().getName():"";
-            //ScannerRange.text = "Scanner Range: " + planet.getOwner() != null ? planet.getOwner().getTechs().getBestPlanetaryScanner().getScanRange().ToString():"";
-            Defenses.text = "Defenses: " + planet.getDefenses() + " of " + planet.getMaxDefenses();
-            DefenseType.text = "Defense Type: " + "type";
-            DefCoverage.text = "Def Coverage: " + "coverage";
+            if (game.getGame().getPlayers()[MessagePanel.instance.playerIndex].hasKnowledge(planet))
+            {
+                title.text = "Minerals On Hand";
+                Population.text = "Population: " + planet.getPopulation();
+                ResourcesYear.text = "Resources/Year: " + planet.getResourcesPerYearAvailable();
+                Defenses.text = "Defenses: " + planet.getDefenses() + " of " + planet.getMaxDefenses();
+                DefenseType.text = "Defense Type: " + "Surface";
+                DefCoverage.text = "Def Coverage: " + "coverage";
+            }
+            else
+            {
+                title.text = "Minerals On Hand";
+                Population.text = "Population: Unknown";
+                ResourcesYear.text = "Resources/Year: Unknown";
+                Defenses.text = "Defenses: Unknown";
+                DefenseType.text = "Defense Type: Unknown";
+                DefCoverage.text = "Def Coverage: Unknown";
+            }
         }
         else
         {

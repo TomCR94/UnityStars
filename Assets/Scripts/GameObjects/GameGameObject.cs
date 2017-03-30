@@ -4,18 +4,16 @@ using UnityEngine;
 
 public class GameGameObject : MonoBehaviour {
 
+    public static GameGameObject instance;
+
     [SerializeField]
     public Game game;
 
     // Use this for initialization
-    void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    private void Awake()
+    {
+        instance = this;
+    }
 
     public Game getGame()
     {

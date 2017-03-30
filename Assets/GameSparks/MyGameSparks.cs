@@ -9,6 +9,49 @@ using GameSparks.Api.Responses;
 //THIS FILE IS AUTO GENERATED, DO NOT MODIFY!!
 
 namespace GameSparks.Api.Requests{
+	public class LogEventRequest_DeleteUploaded : GSTypedRequest<LogEventRequest_DeleteUploaded, LogEventResponse>
+	{
+	
+		protected override GSTypedResponse BuildResponse (GSObject response){
+			return new LogEventResponse (response);
+		}
+		
+		public LogEventRequest_DeleteUploaded() : base("LogEventRequest"){
+			request.AddString("eventKey", "DeleteUploaded");
+		}
+		
+		public LogEventRequest_DeleteUploaded Set_Upload( string value )
+		{
+			request.AddString("Upload", value);
+			return this;
+		}
+	}
+	
+	public class LogChallengeEventRequest_DeleteUploaded : GSTypedRequest<LogChallengeEventRequest_DeleteUploaded, LogChallengeEventResponse>
+	{
+		public LogChallengeEventRequest_DeleteUploaded() : base("LogChallengeEventRequest"){
+			request.AddString("eventKey", "DeleteUploaded");
+		}
+		
+		protected override GSTypedResponse BuildResponse (GSObject response){
+			return new LogChallengeEventResponse (response);
+		}
+		
+		/// <summary>
+		/// The challenge ID instance to target
+		/// </summary>
+		public LogChallengeEventRequest_DeleteUploaded SetChallengeInstanceId( String challengeInstanceId )
+		{
+			request.AddString("challengeInstanceId", challengeInstanceId);
+			return this;
+		}
+		public LogChallengeEventRequest_DeleteUploaded Set_Upload( string value )
+		{
+			request.AddString("Upload", value);
+			return this;
+		}
+	}
+	
 	public class LogEventRequest_GSD : GSTypedRequest<LogEventRequest_GSD, LogEventResponse>
 	{
 	
