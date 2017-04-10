@@ -3,30 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Tech {
-
-    /**
-   * the tech name
-   */
+    
     private string name;
-
-    /**
-     * the cost of this tech
-     */
+    
     private Cost cost = new Cost();
-
-    /**
-     * the requirements of this tech
-     */
+    
     private TechRequirements techRequirements;
-
-    /**
-     * where this tech ranks in the UI list order
-     */
+    
     private int ranking;
-
-    /**
-     * the category this tech belongs to, i.e. armor, hull, etc.
-     */
+    
     private TechCategory category;
 
     public Tech()

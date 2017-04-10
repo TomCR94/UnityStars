@@ -36,11 +36,7 @@ public class ResearchCost {
         this.electronics = electronics;
         this.biotechnology = biotechnology;
     }
-
-    /**
-     * Copy constructor for convenience
-     * @param researchCost The instance of ResesarchCost to make a copy of
-     */
+    
     public ResearchCost(ResearchCost researchCost)
     {
         this.energy = researchCost.energy;

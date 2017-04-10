@@ -77,12 +77,9 @@ public class Race : AbstractStarsObject_NonMono {
 
     /**
      * Copy constructor for initializing the race for a player
-     * @param race The race to copy
-     * @param player The player to assign this race to
      */
     public Race(Race race, Player player)
     {
-        //this.user = race.user;
         this.name = race.name;
         this.pluralName = race.pluralName;
         this.prt = race.prt;
@@ -130,13 +127,10 @@ public class Race : AbstractStarsObject_NonMono {
 
     /**
      * Get a copy of a humanoid Race
-     * 
-     * @return A Humanoid race
      */
     public static Race getHumanoid()
     {
         Race race = new Race();
-        //race.setUser(user);
         race.setName("Humanoid");
         race.setPluralName("Humanoids");
 
@@ -197,18 +191,12 @@ public class Race : AbstractStarsObject_NonMono {
 
     /**
      * Determine if this race has an LRT
-     * @param lrt The LRT to check for
-     * @return True if the race has the LRT, false otherwise
      */
     public bool hasLRT(LRT lrt)
     {
         return lrts.Contains(lrt);
     }
-
-    /**
-     * @return Return the center point of this hab, i.e. for hab 25 to 75 the center is 50 hab 60 to
-     *         100 the center is 80
-     */
+    
     public int getHabCenter(int index)
     {
         return habCenter[index];
@@ -216,9 +204,6 @@ public class Race : AbstractStarsObject_NonMono {
 
     /**
      * Return whether this race is immune to a specific hab, by index
-     * 
-     * @param index The index of the hab, 0 == gravity, 1 == temp, 2 == radiation
-     * @return Whether this race is immune to the specific hab type.
      */
     public bool isImmune(int index)
     {
@@ -242,9 +227,6 @@ public class Race : AbstractStarsObject_NonMono {
 
     /**
      * Get the habitability of this race for a given planet's hab value
-     * 
-     * @param planetHabData The Hab value for a planet.
-     * @return The habiability of this race to that planet, with 100 being the best
      */
     public long getPlanetHabitability(Hab planetHabData)
     {
@@ -263,7 +245,7 @@ public class Race : AbstractStarsObject_NonMono {
             {
                 if (habLower <= habValue && habUpper >= habValue)
                 {
-                    /* green planet */
+                    /* ideal planet */
                     fromIdeal = Mathf.Abs(habValue - habCenter) * 100;
                     if (habCenter > habValue)
                     {
@@ -288,7 +270,7 @@ public class Race : AbstractStarsObject_NonMono {
                 }
                 else
                 {
-                    /* red planet */
+                    /* bad planet */
                     if (habLower <= habValue)
                         habRed = habValue - habUpper;
                     else
@@ -515,16 +497,6 @@ public class Race : AbstractStarsObject_NonMono {
         this.researchCost = researchCost;
     }
 
-    //public void setUser(User user)
-   // {
-    //    this.user = user;
-  //  }
-
-    //public User getUser()
- //   {
-   //     return user;
- //   }
-
     public void setPRT(PRT prt)
     {
         this.prt = prt;
@@ -540,27 +512,8 @@ public class Race : AbstractStarsObject_NonMono {
         return prt;
     }
 
-    //public void setPlayer(Player player)
-   // {
-     //   this.player = player;
-   // }
-
-  //  public Player getPlayer()
-  //  {
-   //     return player;
-  //  }
-    
-  //  public string getPlayerId()
-   // {
-  //      return player.getID();
- //   }
-
     /**
      * Get the research cost for a tech field/level
-     * 
-     * @param field The field to check
-     * @param level The level to check
-     * @return The cost to research that level
      */
     public int getResearchCostForLevel(TechField field, int level)
     {

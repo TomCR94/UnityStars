@@ -8,68 +8,34 @@ public class FleetControllerImpl : FleetController {
 
     /**
      * Create a new fleet
-     * @param name The name of the fleet
-     * @param x the x coord
-     * @param y the y coord
-     * @param owner the owner
-     * @return The newly created fleet
      */
-    public Fleet create(string name, int x, int y, Player owner)
+    public Fleet makeFleet(string name, int x, int y, Player owner)
     {
         return new Fleet(name, x, y, owner);
     }
 
     /**
-     * Fuel usage calculation courtesy of m.a@stars
-     * 
-     * @param speed The warp speed 1 to 10
-     * @param mass The mass of the fleet
-     * @param dist The distance travelled
-     * @param ifeFactor The factor for improved fuel efficiency (.85 if you have the LRT)
-     * @param engine The engine being used
-     * @return The amount of mg of fuel used
+     * Fuel usage calculation
      */
     public int getFuelCost(int speed, int mass, double dist, double ifeFactor, TechEngine engine)
     {
-        // 1 mg of fuel will move 200 kt of weight 1 LY at a Fuel Usage Number of 100.
-        // Number of engines doesn't matter. Neither number of ships with the same engine.
 
-        double distanceCeiling = Mathf.Ceil((float)dist); // rounding to next integer gives best graph fit
-        // window.status = 'Actual distance used is ' + Distan + 'ly';
-
-        // IFE is applied to drive specifications, just as the helpfile hints.
-        // Stars! probably does it outside here once per turn per engine to save time.
+        double distanceCeiling = Mathf.Ceil((float)dist); 
         double engineEfficiency = Mathf.Ceil((float)ifeFactor * engine.getFuelUsage()[speed - 1]);
-
-        // 20000 = 200*100
-        // Safe bet is Stars! does all this with integer math tricks.
-        // Subtracting 2000 in a loop would be a way to also get the rounding.
-        // Or even bitshift for the 2 and adjust "decimal point" for the 1000
         double teorFuel = (Mathf.Floor((float)(mass * engineEfficiency * distanceCeiling / 2000) / 10));
-        // using only one decimal introduces another artifact: .0999 gets rounded down to .0
-
-        // The heavier ships will benefit the most from the accuracy
+        
         int intFuel = (int)Mathf.Ceil((float)teorFuel);
-
-        // That's all. Nothing really fancy, much less random. Subtle differences in
-        // math lib workings might explain the rarer and smaller discrepancies observed
         return intFuel;
-        // Unrelated to this fuel math are some quirks inside the
-        // "negative fuel" watchdog when the remainder of the
-        // trip is < 1 ly. Aahh, the joys of rounding! ;o)
     }
 
     public int getFuelCost(Fleet fleet, int speed, double dist)
     {
-        // figure out how much fuel we're going to use
         double ifeFactor = fleet.getOwner().getRace().hasLRT(LRT.IFE) ? .85 : 1.0;
 
         int fuelCost = 0;
-
-        // compute each ship stack separately
+        
         foreach (ShipStack stack in fleet.getShipStacks())
         {
-            // figure out this ship stack's mass as well as it's proportion of the cargo
             int mass = stack.getDesign().getAggregate().getMass() * stack.getQuantity();
             int fleetCargo = fleet.getCargo().getTotal();
             int stackCapacity = stack.getDesign().getAggregate().getCargoCapacity() * stack.getQuantity();
@@ -85,7 +51,7 @@ public class FleetControllerImpl : FleetController {
         return fuelCost;
     }
 
-    public void move(Fleet fleet)
+    public void moveFleetTowards(Fleet fleet)
     {
         if (fleet.getWaypoints().Count > 1)
         {
@@ -93,14 +59,11 @@ public class FleetControllerImpl : FleetController {
             Waypoint wp1 = fleet.getWaypoints()[1];
             int totaldist = (int)(MapObject.realDist(fleet.getX(), fleet.getY(), wp1.getX(), wp1.getY()));
             int dist = wp1.getSpeed() * wp1.getSpeed();
-
-            // go with the lower
+            
             if (totaldist < dist)
             {
                 dist = totaldist;
             }
-
-            // get the cost for the fleet
             int fuelCost = getFuelCost(fleet, wp1.getSpeed(), dist);
             fleet.setFuel(fleet.getFuel() - fuelCost);
 
@@ -113,8 +76,8 @@ public class FleetControllerImpl : FleetController {
                     Planet planet = (Planet)wp1.getTarget();
                     fleet.setOrbiting(planet);
 
-                    if (wp1.getTask() == WaypointTask.Colonize)
-                        colonize(fleet, wp1);
+                    if (wp1.getTask() == WaypointTask.Colonise)
+                        colonise(fleet, wp1);
                     else if (wp1.getTask() == WaypointTask.Bomb)
                         Bomb(fleet);
                     else if (wp1.getTask() == WaypointTask.Invade)
@@ -122,9 +85,7 @@ public class FleetControllerImpl : FleetController {
                     else if (wp1.getTask() == WaypointTask.UnloadCargo)
                         UnloadCargo(fleet, wp1);
                     else if (wp1.getTask() == WaypointTask.ScrapFleet)
-                        scrap(fleet, wp1);
-                    else if (wp1.getTask() == WaypointTask.Terraform)
-                        Terraform(fleet, wp1);
+                        destroyAndDistributeResources(fleet, wp1);
                 }
                 else if (wp1.getTarget() != null && wp1.getTarget() is Wormhole)
                 {
@@ -150,7 +111,6 @@ public class FleetControllerImpl : FleetController {
             }
             else
             {
-                // move this fleet closer to the next waypoint
                 fleet.setX(fleet.getX() + (int)((wp1.getX() - fleet.getX()) * ((float)(dist) / (float)(totaldist))));
                 fleet.setY(fleet.getY() + (int)((wp1.getY() - fleet.getY()) * ((float)(dist) / (float)(totaldist))));
 
@@ -190,29 +150,23 @@ public class FleetControllerImpl : FleetController {
 
     /**
      * Process the task for a given waypoint
-     * 
-     * @param fleet The fleet to process
-     * @param wp The waypoint with the task
      */
-    public void processTask(Fleet fleet, Waypoint wp)
+    public void doTask(Fleet fleet, Waypoint wp)
     {
 
         switch (wp.getTask())
         {
-            case WaypointTask.Colonize:
-                colonize(fleet, wp);
+            case WaypointTask.Colonise:
+                colonise(fleet, wp);
                 break;
             case WaypointTask.Invade:
                 Invade(fleet, wp);
                 break;
             case WaypointTask.ScrapFleet:
-                scrap(fleet, wp);
+                destroyAndDistributeResources(fleet, wp);
                 break;
             case WaypointTask.UnloadCargo:
                 UnloadCargo(fleet, wp);
-                break;
-            case WaypointTask.Terraform:
-                Terraform(fleet, wp);
                 break;
             case WaypointTask.Bomb:
                 Bomb(fleet);
@@ -221,10 +175,6 @@ public class FleetControllerImpl : FleetController {
                 Stabilize(fleet, wp);
                 break;
         }
-    }
-
-    private void Terraform(Fleet fleet, Waypoint wp)
-    { 
     }
 
     private void Bomb(Fleet fleet)
@@ -242,14 +192,11 @@ public class FleetControllerImpl : FleetController {
             return;
         }
 
-        // If we don't have bombers then there is nothing more to do here
-
         if (!fleet.getAggregate().isBomber())
         {
             Message.BombNotBomber(fleet.getOwner(), fleet);
             return;
         }
-        // Bomb colonists
         double killFactor = fleet.getAggregate().getKillPop();
         double defenseFactor = 1.0 - planet.getDefenses()/100f;
         double populationKill = killFactor * defenseFactor;
@@ -260,9 +207,6 @@ public class FleetControllerImpl : FleetController {
 
         int dead = (int)Math.Max(killed, minKilled);
         planet.getCargo().addColonists(-dead);
-
-
-        // Get installation details
         double totalBuildings = planet.getMines() + planet.getFactories() + planet.getDefenses();
 
         double buildingKills = fleet.getAggregate().getKillPop() * (1 - planet.getDefenses() / 100f);
@@ -272,21 +216,12 @@ public class FleetControllerImpl : FleetController {
         {
             damagePercent = 1;
         }
-
-        // We now have the percentage of each building type to destroy (which
-        // has been clamped at a maximum of 100% (normalised so that 100% =
-        // 1). Let's apply that percentage to each building type in
-        // turn. First Defenses:
-
-        // Defenses
         int defensesDestroyed = (int)((double)planet.getDefenses() * damagePercent);
         planet.setDefenses(planet.getDefenses() - defensesDestroyed);
-
-        // Now Factories
+        
         int factoriesDestroyed = (int)(planet.getFactories() * damagePercent);
         planet.setFactories(planet.getFactories() - factoriesDestroyed);
-
-        // Now Mines
+        
         int minesDestroyed = (int)(planet.getMines() * damagePercent);
         planet.setMines(planet.getMines() - minesDestroyed);
 
@@ -297,8 +232,7 @@ public class FleetControllerImpl : FleetController {
         else
         {
             Message.BombKillAll(fleet.getOwner(), fleet, planet);
-
-            // clear out the colony
+            
             planet.getQueue().getItems().Clear();
             planet.setCargo(new Cargo(0, 0, 0, 0, 0));
             planet.setOwner(null);
@@ -326,8 +260,7 @@ public class FleetControllerImpl : FleetController {
         fleet.getCargo().setIronium(0);
         fleet.getCargo().setBoranium(0);
         fleet.getCargo().setGermanium(0);
-
-        // check if this is normal transportation or an invasion
+        
         if (fleet.getOwner().getID() != targetPlanet.getOwner().getID() && fleet.getCargo().getColonists() != 0)
         {
             Invade(fleet, wp);
@@ -342,7 +275,6 @@ public class FleetControllerImpl : FleetController {
 
     private void Invade(Fleet fleet, Waypoint wp)
     {
-        // First check that we are actuallly in orbit around a planet.
 
         if (fleet.getOrbiting() == null)
         {
@@ -350,14 +282,12 @@ public class FleetControllerImpl : FleetController {
             return;
         }
 
-        // and that we have troops.
-
         int troops = fleet.getCargo().getColonists();
         Planet planet = fleet.getOrbiting(); ;
 
         if (planet.getOwner() == null)
         {
-            colonize(fleet, wp);
+            colonise(fleet, wp);
         }
 
         if (troops == 0)
@@ -365,31 +295,25 @@ public class FleetControllerImpl : FleetController {
             Message.InvadeNoTroops(fleet.getOwner(), fleet, planet);
             return;
         }
-
-        // Consider the diplomatic situation
+        
         if (fleet.getOwner().getID() == planet.getOwner().getID())
         {
-            // already own this planet, so colonists can beam down safely
             planet.getCargo().addColonists(troops);
             fleet.getCargo().setColonists(0);
             Message.InvadeAlreadyOwned(fleet.getOwner(), fleet, planet);
             return;
         }
-
-        // check for starbase
+        
         if (planet.getStarbase() != null)
         {
             Message.InvadeStarBase(fleet.getOwner(), fleet, planet);
             return;
         }
-
-        // The troops are now committed to take the star or die trying
+        
         fleet.getCargo().setColonists(0);
-
-        // Take into account the Defenses
+        
         int troopsOnGround = (int)(troops * (1 - (planet.getDefenses()/100)));
-
-        // Apply defender and attacker bonuses
+        
         double attackerBonus = 1.1;
         if (fleet.getOwner().getRace().getPRT() == PRT.WM)//WM
             attackerBonus *= 1.5;
@@ -404,7 +328,6 @@ public class FleetControllerImpl : FleetController {
         
         if (survivorStrength > 0)
         {
-            // defenders win
             int remainingDefenders = (int)(survivorStrength / defenderBonus);
             int defendersKilled = planet.getCargo().getColonists()- remainingDefenders;
             planet.getCargo().setColonists(remainingDefenders);
@@ -413,7 +336,6 @@ public class FleetControllerImpl : FleetController {
         }
         else if (survivorStrength < 0)
         {
-            // attacker wins
             planet.getQueue().getItems().Clear();
             int remainingAttackers = (int)(-survivorStrength / attackerBonus);
             int attackersKilled = troops - remainingAttackers;
@@ -424,10 +346,8 @@ public class FleetControllerImpl : FleetController {
         }
         else
         {
-            // no survivors!
             Message.InvadeDraw(fleet.getOwner(), planet);
-
-            // clear out the colony
+            
             planet.getQueue().getItems().Clear();
             planet.setCargo(new Cargo(0, 0, 0, 0, 0));
             planet.setOwner(null);
@@ -436,19 +356,14 @@ public class FleetControllerImpl : FleetController {
 
     /**
      * Scrap this fleet, adding resources to the waypoint
-     * 
-     * @param fleet The fleet to scrap
      */
-    public void scrap(Fleet fleet, Waypoint wp)
+    public void destroyAndDistributeResources(Fleet fleet, Waypoint wp)
     {
-        Debug.Log("Scrap");
         Cost cost = new Cost(fleet.getAggregate().getCost());
         cost = cost.add(new Cost(fleet.getCargo().getIronium(), fleet.getCargo().getBoranium(), fleet.getCargo().getGermanium(), 0));
-        Debug.Log("PlanetDict" + wp.getTarget().getName());
         if (PlanetDictionary.instance.getPlanetForID(wp.getTarget().getName()) != null)
         {
             Planet planet = PlanetDictionary.instance.getPlanetForID(wp.getTarget().getName());
-            Debug.Log("Planet exists " + planet.getName());
             planet.setCargo(planet.getCargo().add(new Mineral(cost.getIronium(), cost.getBoranium(), cost.getGermanium())));
             fleet.setOrbiting(null);
             fleet.setScrapped(true);
@@ -458,46 +373,40 @@ public class FleetControllerImpl : FleetController {
     }
 
     /**
-     * Take this fleet and have it colonize a planet
-     * 
-     * @param fleet The fleet to colonize
-     * @param wp The waypoint pointing to the target planet to colonize
+     * Take this fleet and have it colonise a planet
      */
-    public void colonize(Fleet fleet, Waypoint wp)
+    public void colonise(Fleet fleet, Waypoint wp)
     {
         Planet planet = PlanetDictionary.instance.getPlanetForID(wp.getTarget().getName());
         if (planet == null)
         {
-            Message.colonizeNonPlanet(fleet.getOwner(), fleet);
+            Message.coloniseNonPlanet(fleet.getOwner(), fleet);
         }
         else if (planet.getOwner() != null)
         {
-            Message.colonizeOwnedPlanet(fleet.getOwner(), fleet);
+            Message.coloniseOwnedPlanet(fleet.getOwner(), fleet);
         }
-        else if (!fleet.getAggregate().isColonizer())
+        else if (!fleet.getAggregate().isColoniser())
         {
-            Message.colonizeWithNoModule(fleet.getOwner(), fleet);
+            Message.coloniseWithNoModule(fleet.getOwner(), fleet);
         }
         else if (fleet.getCargo().getColonists() <= 0)
         {
-            Message.colonizeWithNoColonists(fleet.getOwner(), fleet);
+            Message.coloniseWithNoColonists(fleet.getOwner(), fleet);
         }
         else
         {
             planet.setOwner(fleet.getOwner());
             planet.setPopulation(fleet.getCargo().getColonists() * 100);
             fleet.getCargo().setColonists(0);
-            scrap(fleet, wp);
+            destroyAndDistributeResources(fleet, wp);
         }
     }
 
     /**
      * Merge a ship_stack with this fleet, combining ship_stacks if the same design is found
-     * 
-     * @param fleet The fleet to merge into
-     * @param stack The stack to merge
      */
-    public void merge(Fleet fleet, ShipStack stack)
+    public void addFleetToStack(Fleet fleet, ShipStack stack)
     {
         bool found_stack = false;
         foreach (ShipStack fleetStack in fleet.getShipStacks())

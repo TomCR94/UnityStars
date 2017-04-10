@@ -8,11 +8,7 @@ public class FleetKnowledge : AbstractStarsObject_NonMono
 
     [SerializeField]
     private string fleetId;
-
-    /**
-     * Do we have knowledge of this fleet by penetrating scanners? We don't keep knowledge of
-     * through turns, they are discarded each turn
-     */
+    
     private bool pen;
 
     public FleetKnowledge()

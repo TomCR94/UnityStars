@@ -16,10 +16,10 @@ public enum MessageType
     BuiltStarbase,
     FleetOrdersComplete,
     FleetScrapped,
-    ColonizeOwnedPlanet,
-    ColonizeNonPlanet,
-    ColonizeWithNoColonizationModule,
-    ColonizeWithNoColonists,
-    PlanetColonized,
+    ColoniseOwnedPlanet,
+    ColoniseNonPlanet,
+    ColoniseWithNoColonizationModule,
+    ColoniseWithNoColonists,
+    PlanetColonised,
     GainTechLevel
 }

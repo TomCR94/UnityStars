@@ -257,6 +257,38 @@ namespace GameSparks.Api.Requests{
 		}
 	}
 	
+	public class LogEventRequest_Win : GSTypedRequest<LogEventRequest_Win, LogEventResponse>
+	{
+	
+		protected override GSTypedResponse BuildResponse (GSObject response){
+			return new LogEventResponse (response);
+		}
+		
+		public LogEventRequest_Win() : base("LogEventRequest"){
+			request.AddString("eventKey", "Win");
+		}
+	}
+	
+	public class LogChallengeEventRequest_Win : GSTypedRequest<LogChallengeEventRequest_Win, LogChallengeEventResponse>
+	{
+		public LogChallengeEventRequest_Win() : base("LogChallengeEventRequest"){
+			request.AddString("eventKey", "Win");
+		}
+		
+		protected override GSTypedResponse BuildResponse (GSObject response){
+			return new LogChallengeEventResponse (response);
+		}
+		
+		/// <summary>
+		/// The challenge ID instance to target
+		/// </summary>
+		public LogChallengeEventRequest_Win SetChallengeInstanceId( String challengeInstanceId )
+		{
+			request.AddString("challengeInstanceId", challengeInstanceId);
+			return this;
+		}
+	}
+	
 }
 	
 

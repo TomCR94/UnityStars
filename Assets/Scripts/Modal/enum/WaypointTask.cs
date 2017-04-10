@@ -7,5 +7,5 @@ using UnityEngine;
  */
 public enum WaypointTask
 {
-    None, Colonize, Invade, ScrapFleet, UnloadCargo, Terraform, Bomb, Stabilize
+    None, Colonise, Invade, ScrapFleet, UnloadCargo, Bomb, Stabilize
 }

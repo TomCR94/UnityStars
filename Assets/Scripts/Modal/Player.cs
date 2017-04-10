@@ -5,40 +5,24 @@ using UnityEngine;
 
 [Serializable]
 public class Player : AbstractStarsObject_NonMono {
-
-
-    /**
-     * The user of this player
-     */
+    
     [SerializeField]
     private User user;
-
-    /**
-     * The race of this player
-     */
+    
     [SerializeField]
     private Race race;
-
-    /**
-     * The homeworld of this player
-     */
+    
     [SerializeField]
     private string homeworldID;
-
-    /**
-     * The ship designs this player owns
-     */
+    
     private List<ShipDesign> designs = new List<ShipDesign>();
 
     [SerializeField]
     private List<string> designIDs = new List<string>();
-
-    /**
-     * The Messages for this player
-     */
+    
     [SerializeField]
     private List<Message> messages = new List<Message>();
-    //TODO serialize knowledges
+
     [SerializeField]
     private List<FleetKnowledge> fleetKnowledges = new List<FleetKnowledge>();
 
@@ -47,53 +31,28 @@ public class Player : AbstractStarsObject_NonMono {
 
     [SerializeField]
     private String name;
-
-    /**
-     * The current tech levels for this player
-     */
+    
     [SerializeField]
     private TechLevel techLevels = new TechLevel();
-
-    /**
-     * The amount of research points spent on each tech level.
-     */
+    
     [SerializeField]
     private TechLevel techLevelsSpent = new TechLevel();
-
-    /**
-     * The current field researching
-     */
+    
     [SerializeField]
     private TechField currentResearchField = TechField.Energy;
-
-    /**
-     * The next field to research
-     */
+    
     [SerializeField]
     private NextResearchField nextResearchField = NextResearchField.SameField;
-
-    /**
-     * The percentage of resources to spend on research
-     */
+    
     [SerializeField]
     private int researchAmount = 15;
-
-    /**
-     * Has this player submitted their turn?
-     */
+    
     [SerializeField]
     private bool submittedTurn;
-
-    /**
-     * The number of fleets this player has built
-     */
+    
     [SerializeField]
     private int numFleetsBuilt;
-
-    /**
-     * if this player has been invited to a game, default to not accept until the player actually
-     * accepts the invitation
-     */
+    
     [SerializeField]
     private bool accepted = false;
     
@@ -126,11 +85,8 @@ public class Player : AbstractStarsObject_NonMono {
             string filePath = Application.persistentDataPath + "/Races/Humanoid.race";
             string dataAsJson = File.ReadAllText(filePath);
             Debug.Log(dataAsJson);
-            // Pass the json to JsonUtility, and tell it to create a GameData object from it
             Race loadedData = JsonUtility.FromJson<Race>(dataAsJson);
             setRace(loadedData);
-            //race.setPlayer(this);
-            //race.setUser(getUser());
         }
     }
 
@@ -146,13 +102,9 @@ public class Player : AbstractStarsObject_NonMono {
 
     /**
      * Initialize this player with a race by creating a copy of the race
-     * 
-     * @param race The race to copy
      */
     public void initWithRace(Race race)
     {
-        // create a new race assigned to this player, so that the
-        // user can edit the race without affecting the one in the game
         this.race = new Race(race, this);
     }
 
@@ -199,9 +151,6 @@ public class Player : AbstractStarsObject_NonMono {
 
     /**
      * Return True if the player can have this tech, False otherwise
-     * 
-     * @param tech The tech to check
-     * @return True if this player can have this tech
      */
     public bool hasTech(Tech tech)
     {
@@ -240,16 +189,11 @@ public class Player : AbstractStarsObject_NonMono {
 
         return true;
     }
-
-    /**
-     * @return Based on player settings, return the next field we should research
-     */
+    
     public TechField getNextField()
     {
         TechField field = currentResearchField;
-
-        // if this is going to the same field, or the next field is specified, set it
-        // to that field
+        
         if (nextResearchField == NextResearchField.SameField)
         {
             field = currentResearchField;
@@ -258,8 +202,7 @@ public class Player : AbstractStarsObject_NonMono {
         {
             field = (TechField)Enum.Parse(typeof(TechField), nextResearchField.ToString(), true);
         }
-
-        // make sure we aren't at the max of this field
+        
         int nextLevel = techLevels.level(field);
         if (nextLevel >= Consts.maxTechLevel || nextResearchField == NextResearchField.LowestField)
         {
@@ -283,15 +226,11 @@ public class Player : AbstractStarsObject_NonMono {
         }
         knowledge = getPlanetKnowledge(planet);
 
-        // discover this planet by copying the root knowledge to the user knowledge
         knowledge.discover(game.getYear(), planet);
     }
 
     /**
      * Return true if the player has knowlege of the planet
-     * 
-     * @param player The player to check knowledge for
-     * @return False if the player does not have knowledge
      */
     public bool hasKnowledge(Planet planet)
     {
@@ -303,9 +242,6 @@ public class Player : AbstractStarsObject_NonMono {
 
     /**
      * Return true if the player has knowledge of the fleet
-     * 
-     * @param player The player to check knowledge for
-     * @return False if the player does not have knowledge
      */
     public bool hasKnowledge(Fleet fleet)
     {
@@ -317,8 +253,6 @@ public class Player : AbstractStarsObject_NonMono {
 
     /**
      * Get the knowledge for a player
-     * @param player The player
-     * @return The PlanetKnowledge for this player, or null if not found
      */
     public PlanetKnowledge getPlanetKnowledge(Planet planet)
     {

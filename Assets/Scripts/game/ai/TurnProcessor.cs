@@ -7,7 +7,6 @@ public interface TurnProcessor
 
     /**
      * Initialize a turn processor with a player instance
-     * @param player The player to process turns for
      */
     void init(Player player, Game game);
 

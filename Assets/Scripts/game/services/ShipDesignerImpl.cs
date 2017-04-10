@@ -9,8 +9,7 @@ public class ShipDesignerImpl : ShipDesigner
 public ShipDesign designShip(TechHull hull, Player player)
 {
     ShipDesign design = new ShipDesign(hull.getName(), hull);
-
-    // fill in all the slots
+        
     foreach (ShipDesignSlot slot in design.getSlots())
     {
         HullSlotType[] types = slot.getHullSlot().getTypes();
@@ -57,20 +56,17 @@ public ShipDesign designShip(TechHull hull, Player player)
 
     public void initShipDesign(ShipDesign design)
     {
-        // fill in the TechHull
         TechHull hull = StaticTechStore.getInstance().getHull(design.getHullName());
         design.setHull(hull);
         for (int slotIndex = 0; slotIndex < hull.getSlots().Count; slotIndex++)
         {          
-            // Fill in the TechHullSlot for this index 
             ShipDesignSlot designSlot = design.getSlots()[slotIndex];
             if (designSlot.getHullComponentName() == null)
                 break;
             designSlot.setHullSlot(hull.getSlots()[slotIndex]);
             designSlot.setHullComponent(StaticTechStore.getInstance().getHullComponent(designSlot.getHullComponentName()));
         }
-
-        // fill in the aggregate engine
+        
         design.getAggregate().setEngine(
             StaticTechStore.getInstance().
             getEngine(

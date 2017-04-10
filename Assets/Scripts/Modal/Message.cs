@@ -73,37 +73,37 @@ public class Message : AbstractStarsObject_NonMono {
 
     }
 
-    public static void colonizeNonPlanet(Player player, Fleet fleet)
+    public static void coloniseNonPlanet(Player player, Fleet fleet)
     {
-        string text = string.Format("{0} has attempted to colonize a waypoint with no Planet.", fleet.getName());
-        player.getMessages().Add(new Message(MessageType.ColonizeNonPlanet, text));
+        string text = string.Format("{0} has attempted to colonise a waypoint with no Planet.", fleet.getName());
+        player.getMessages().Add(new Message(MessageType.ColoniseNonPlanet, text));
 
     }
 
-    public static void colonizeOwnedPlanet(Player player, Fleet fleet)
+    public static void coloniseOwnedPlanet(Player player, Fleet fleet)
     {
-        string text = string.Format("{0} has attempted to colonize a planet that is already inhabited.", fleet.getName());
-        player.getMessages().Add(new Message(MessageType.ColonizeOwnedPlanet, text));
+        string text = string.Format("{0} has attempted to colonise a planet that is already inhabited.", fleet.getName());
+        player.getMessages().Add(new Message(MessageType.ColoniseOwnedPlanet, text));
 
     }
 
-    public static void colonizeWithNoModule(Player player, Fleet fleet)
+    public static void coloniseWithNoModule(Player player, Fleet fleet)
     {
-        string text = string.Format("{0} has attempted to colonize a planet without a colonization module.", fleet.getName());
-        player.getMessages().Add(new Message(MessageType.ColonizeWithNoColonizationModule, text));
+        string text = string.Format("{0} has attempted to colonise a planet without a colonization module.", fleet.getName());
+        player.getMessages().Add(new Message(MessageType.ColoniseWithNoColonizationModule, text));
 
     }
 
-    public static void colonizeWithNoColonists(Player player, Fleet fleet)
+    public static void coloniseWithNoColonists(Player player, Fleet fleet)
     {
-        string text = string.Format("{0} has attempted to colonize a planet without bringing any colonists.", fleet.getName());
-        player.getMessages().Add(new Message(MessageType.ColonizeWithNoColonists, text));
+        string text = string.Format("{0} has attempted to colonise a planet without bringing any colonists.", fleet.getName());
+        player.getMessages().Add(new Message(MessageType.ColoniseWithNoColonists, text));
     }
 
-    public static void planetColonized(Player player, Planet planet)
+    public static void planetColonised(Player player, Planet planet)
     {
         string text = string.Format("Your colonists are now in control of {0}", planet.getName());
-        player.getMessages().Add(new Message(MessageType.PlanetColonized, text, planet));
+        player.getMessages().Add(new Message(MessageType.PlanetColonised, text, planet));
     }
 
     public static void fleetScrapped(Player player, Fleet fleet, int num_minerals, Planet planet)
@@ -128,12 +128,12 @@ public class Message : AbstractStarsObject_NonMono {
             double growth = (habValue / 100.0) * player.getRace().getGrowthRate();
             if (habValue > 0)
             {
-                text = string.Format("You have found a new habitable planet.  Your colonists will grow by up {0}% per year if you colonize {1}", growth,
+                text = string.Format("You have found a new habitable planet.  Your colonists will grow by up {0}% per year if you colonise {1}", growth,
                                      planet.getName());
             }
             else
             {
-                text = string.Format("You have found a new planet which unfortunately is not habitable by you.  {0}% of your colonists will die per year if you colonize {1}",
+                text = string.Format("You have found a new planet which unfortunately is not habitable by you.  {0}% of your colonists will die per year if you colonise {1}",
                                      -growth, planet.getName());
             }
         }
@@ -225,6 +225,20 @@ public class Message : AbstractStarsObject_NonMono {
         string text = string.Format("The defenders were slain but {0} troops were killed in the attack.", attackersKilled);
         player.getMessages().Add(new Message(MessageType.Info, text, target));
         target.getOwner().getMessages().Add(new Message(MessageType.Info, text, target));
+    }
+
+    public static void terraform(Player player, Planet planet, int amount, int index)
+    {
+        string[] names = new string[] { "gravity", "temperature", "radiation" };
+        string text = string.Format("{0} has been terraformed for {1} by {2} points.", planet.getName(), names[index], amount);
+        player.getMessages().Add(new Message(MessageType.Info, text, planet));
+    }
+
+    public static void noNeedToTerraform(Player player, Planet planet, int index)
+    {
+        string[] names = new string[] { "gravity", "temperature", "radiation" };
+        string text = string.Format("{0} does not need to be terraformed for {1}.", planet.getName(), names[index]);
+        player.getMessages().Add(new Message(MessageType.Info, text, planet));
     }
 
     public static void InvadeDraw(Player player, Planet target)

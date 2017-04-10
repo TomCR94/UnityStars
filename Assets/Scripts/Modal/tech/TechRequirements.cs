@@ -3,25 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class TechRequirements : TechLevel {
-
-    /**
-    * the Primary Racial Trait required by this tech
-    */
+    
     private PRT _prtRequired;
-
-    /**
-     * the Primary Racial Trait that can't have this tech
-     */
+    
     private PRT _prtDenied;
-
-    /**
-     * The Lesser Racial Trait(s) required by this tech this is a list
-     */
+    
     private HashSet<LRT> _lrtsRequired = new HashSet<LRT>();
-
-    /**
-     * the Lesser Racial Trait(s) that are denied this tech
-     */
+    
     private HashSet<LRT> _lrtsDenied = new HashSet<LRT>();
 
     public TechRequirements() : base()

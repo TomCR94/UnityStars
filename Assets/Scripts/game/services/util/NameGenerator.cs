@@ -3,13 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-
+/*
+ * Class to generate a randomised list of planet names
+ * Player 1 will always be Brin
+ * Player 2 will always be Gaia 2
+ */
 public class NameGenerator {
-
-
-    /**
-     * A master list of names
-     */
+    
     private static List<string> names;
 
     /**
@@ -25,7 +25,6 @@ public class NameGenerator {
 
     /**
      * Get the next name in the list
-     * @return The name at the end of the list
      */
     public string nextName()
     {

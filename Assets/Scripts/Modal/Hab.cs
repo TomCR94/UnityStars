@@ -23,12 +23,7 @@ public class Hab {
         this.temp = temp;
         this.rad = rad;
     }
-
-    /**
-     * Copy constructor
-     * 
-     * @param hab The instance of the hab to copy
-     */
+    
     public Hab(Hab hab)
     {
         this.grav = hab.grav;

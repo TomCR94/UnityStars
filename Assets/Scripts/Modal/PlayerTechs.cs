@@ -56,9 +56,6 @@ public class PlayerTechs
 
     /**
      * Initialize the Player techs with the tech store
-     * 
-     * @param player The player to create a PlayerTechs list for
-     * @param techStore The techstore to get techs from
      */
     public void init(Player player, TechStore techStore)
     {
@@ -104,22 +101,16 @@ public class PlayerTechs
     }
 }
         
-        // sort the category techs
         foreach (TechCategory category in Enum.GetValues(typeof(TechCategory))) {
-            //techsForCategory[category].Sort();
             techsForCategory[category] = techsForCategory[category].OrderBy(t => t.getRanking()).ToList<Tech>();
         }
         
-        // sort the hull components by category and ranking
-        //hullComponents.Sort();
         hullComponents = hullComponents.OrderBy(t => t.getRanking()).ToList<TechHullComponent>();
 
     }
 
     /**
      * Get all the techs for a category, sorted by ranking
-     * @param category The category to get techs for
-     * @return A list of techs in the category
      */
     public List<Tech> getAllForCategory(TechCategory category)
 {
@@ -128,11 +119,6 @@ public class PlayerTechs
 
 /**
  * Add techs to an internal list, if the player has them, returning the best tech
- * @param <T> The type of tech
- * @param player The player
- * @param techs The master list of techs
- * @param internalList The internal list to update
- * @return The best tech of the list
  */
 private T addPlayerTechs<T>(Player player, List<T> techs, List<T> internalList) where T : Tech
 {

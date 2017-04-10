@@ -81,8 +81,7 @@ public class Cost : Mineral {
         int numBoranium = 0;
         int numGermanium = 0;
         numResources = numIronium = numBoranium = numGermanium = int.MaxValue;
-
-        // find the lowest divisor
+        
         if (cost.resources > 0)
         {
             numResources = resources / cost.resources;

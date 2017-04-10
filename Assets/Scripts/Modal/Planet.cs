@@ -109,9 +109,6 @@ public class Planet : MapObject, CargoHolder {
 
     /**
      * Add an item to the Planet's ProductionQueue
-     * 
-     * @param type
-     * @param quantity
      */
     public void addQueueItem(QueueItemType type, int quantity)
     {
@@ -120,10 +117,6 @@ public class Planet : MapObject, CargoHolder {
 
     /**
      * Add a ship to the Planet's ProductionQueue
-     * 
-     * @param type
-     * @param quantity
-     * @param shipDesign
      */
     public void addQueueItem(QueueItemType type, int quantity, ShipDesign shipDesign)
     {
@@ -132,11 +125,6 @@ public class Planet : MapObject, CargoHolder {
 
     /**
      * Add a ship that is to be built into a fleet to the Planet's ProductionQueue
-     * 
-     * @param type
-     * @param quantity
-     * @param shipDesign
-     * @param fleetName
      */
     public void addQueueItem(QueueItemType type, int quantity, ShipDesign shipDesign, string fleetName)
     {
@@ -145,9 +133,6 @@ public class Planet : MapObject, CargoHolder {
 
     /**
      * Make this planet a homeworld planet for a race
-     * 
-     * @param player The player to make this homeworld for
-     * @param year The year the homeworld was founded
      */
     public void makeHomeworld(Player player, int year)
     {
@@ -156,23 +141,19 @@ public class Planet : MapObject, CargoHolder {
         Race race = player.getRace();
 
         System.Random random = new System.Random();
-        // generate mineral concentrations
         int min = Consts.minHWMineralConc;
         int max = Consts.maxStartingConc;
         concMinerals = new Mineral(random.Next(max) + min, random.Next(max) + min, random.Next(max) + min);
         
-        // generate perfect hab range
         hab = new Hab();
         hab.setGrav(((race.getHabHigh().getGrav() - race.getHabLow().getGrav()) / 2) + race.getHabLow().getGrav());
         hab.setTemp(((race.getHabHigh().getTemp() - race.getHabLow().getTemp()) / 2) + race.getHabLow().getTemp());
         hab.setRad(((race.getHabHigh().getRad() - race.getHabLow().getRad()) / 2) + race.getHabLow().getRad());
-
-        // generate surf minerals
+        
         min = Consts.minStartingSurf;
         max = Consts.maxStartingSurf;
         setCargo(new Cargo(random.Next(max) + min, random.Next(max) + min, random.Next(max) + min, 0, 0));
         
-        // setup the population
         setPopulation(Consts.startingPopulation);
         if (race.hasLRT(LRT.LSP))
         {
@@ -189,22 +170,17 @@ public class Planet : MapObject, CargoHolder {
 
     /**
      * Determine the number of resources this planet generates in a year
-     * 
-     * @return The number of resources this planet generates in a year
      */
     public int getResourcesPerYear()
     {
         if (owner != null)
         {
             Race race = owner.getRace();
-
-            // compute resources from population
+            
             int resourcesFromPop = getPopulation() / race.getColonistsPerResource();
-
-            // compute resources from factories
+            
             int resourcesFromFactories = factories * race.getFactoryOutput() / 10;
-
-            // return the sum
+            
             return resourcesFromPop + resourcesFromFactories;
         }
         else
@@ -213,10 +189,7 @@ public class Planet : MapObject, CargoHolder {
         }
 
     }
-
-    /**
-     * @return The mineral output of this planet if it is owned
-     */
+    
     public Mineral getMineralOutput()
     {
         if (owner != null)
@@ -233,20 +206,12 @@ public class Planet : MapObject, CargoHolder {
 
     /**
      * Get the amount of minerals mined in one year, for one type
-     * 
-     * @param mineralConcentration The concentration of minerals
-     * @param mines The number of mines on the planet
-     * @param mineOutput The mine output for the owner race
-     * @return The mineral output for one year for one mineral conc
      */
     private int mineralsPerYear(int mineralConcentration, int mines, int mineOutput)
     {
         return (int)(((float)(mineralConcentration) / 100.0) * ((float)(mines) / 10.0) * (float)(mineOutput));
     }
-
-    /**
-     * @return the amount the population for this planet will grow next turn
-     */
+    
     public int getGrowthAmount()
     {
         if (owner != null)
@@ -271,8 +236,6 @@ public class Planet : MapObject, CargoHolder {
 
     /**
      * Get the max population for this planet
-     * 
-     * @return
      */
     public int getMaxPopulation()
     {
@@ -281,12 +244,10 @@ public class Planet : MapObject, CargoHolder {
 
     /**
      * Get the population density for this planet
-     * 
-     * @return
      */
     public double getPopulationDensity()
     {
-        if (getPopulation() != null && getPopulation() > 0)
+        if (getPopulation() > 0)
         {
             return (double)getPopulation() / getMaxPopulation();
         }
@@ -295,8 +256,6 @@ public class Planet : MapObject, CargoHolder {
 
     /**
      * Determine the number of resources this planet generates in a year
-     * 
-     * @return The number of resources this planet will contribute per year
      */
     public int getResourcesPerYearAvailable()
     {
@@ -312,8 +271,6 @@ public class Planet : MapObject, CargoHolder {
 
     /**
      * Determine the number of resources this planet generates in a year
-     * 
-     * @return The number of resources this planet will contribute per year
      */
     public int getResourcesPerYearResearch()
     {
@@ -326,10 +283,7 @@ public class Planet : MapObject, CargoHolder {
             return getResourcesPerYear();
         }
     }
-
-    /**
-     * @return The maximum number of mines this planet's population can support
-     */
+    
     public int getMaxMines()
     {
         if (owner != null)
@@ -338,10 +292,6 @@ public class Planet : MapObject, CargoHolder {
         }
         return 0;
     }
-
-    /**
-     * @return The maximum number of factories this planet's population can support
-     */
     public int getMaxFactories()
     {
         if (owner != null)
@@ -350,10 +300,7 @@ public class Planet : MapObject, CargoHolder {
         }
         return 0;
     }
-
-    /**
-     * @return The maximum number of defenses this planet's population can support
-     */
+    
     public int getMaxDefenses()
     {
         if (owner != null)

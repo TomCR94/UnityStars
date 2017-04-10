@@ -8,10 +8,7 @@ using UnityEngine;
  */
 public class RacePointsCalculator
 {
-
-    /**
-     * The 'cost' in points of each LRT. A good LRT costs negative, a bad LRT is positive
-     */
+    
     private static Dictionary<LRT, int> lrtPointCost;
     private static Dictionary<PRT, int> prtPointCost;
 
@@ -53,26 +50,22 @@ private static int numIterationsRad;
 private static int numIterationsTemp;
 private static Hab testPlanetHab = new Hab();
 
-/**
+/*
  * Get the Advantage points for a race
- * 
- * @return The advantage points for this race, negative means an invalid race.
  */
-public static int getAdvantagePoints(Race race)
+public static int getPointsAdvantage(Race race)
 {
     RacePointsCalculator.race = race;
     race.init();
-
-    // start off with some constant
+        
     int points = Consts.raceStartingPoints;
 
-    int habPoints = (int)(getHabRangePoints() / 2000);
+    int habPoints = (int)(getHabRange() / 2000);
 
-    int growthRateFactor = race.getGrowthRate(); // use raw growth rate, otherwise
-                                                 // HEs pay for GR at 2x
+    int growthRateFactor = race.getGrowthRate(); 
+
     float grRate = growthRateFactor;
-
-    // update the points based on growth rate
+        
     if (growthRateFactor <= 5)
     {
         points += (6 - growthRateFactor) * 4200;
@@ -106,8 +99,7 @@ public static int getAdvantagePoints(Race race)
     }
 
     points -= (int)(habPoints * growthRateFactor) / 24;
-
-    // give points for off center habs
+        
     int numImmunities = 0;
     for (int habType = 0; habType < 3; habType++)
     {
@@ -120,14 +112,12 @@ public static int getAdvantagePoints(Race race)
             points += Mathf.Abs(race.getHabCenter(habType) - 50) * 4;
         }
     }
-
-    // multiple immunities are penalized extra
+    
     if (numImmunities > 1)
     {
         points -= 150;
     }
-
-    // determine factory costs
+    
     int operationPoints = race.getNumFactories();
     int productionPoints = race.getFactoryOutput();
 
@@ -143,8 +133,7 @@ public static int getAdvantagePoints(Race race)
         {
             productionPoints = 1;
         }
-
-        // HE penalty, 2 for all PRTs execpt 3 for HE
+        
         int factoryProductionCost = 2;
         if (race.getPRT() == PRT.HE)
         {
@@ -152,8 +141,7 @@ public static int getAdvantagePoints(Race race)
         }
 
         productionPoints *= factoryProductionCost;
-
-        // additional penalty for two- and three-immune
+            
         if (numImmunities >= 2)
         {
             points -= (int)((productionPoints * operationPoints) * grRate) / 2;
@@ -163,8 +151,7 @@ public static int getAdvantagePoints(Race race)
             points -= (int)((productionPoints * operationPoints) * grRate) / 9;
         }
     }
-
-    // pop efficiency
+    
     int popEfficiency = race.getColonistsPerResource() / 100;
     if (popEfficiency > 25)
         popEfficiency = 25;
@@ -177,8 +164,7 @@ public static int getAdvantagePoints(Race race)
         points -= 600;
     else if (popEfficiency > 10)
         points += (popEfficiency - 10) * 120;
-
-    // factory points (AR races have very simple points)
+    
     if (race.getPRT() == PRT.AR)
     {
         points += 210;
@@ -216,8 +202,7 @@ public static int getAdvantagePoints(Race race)
         {
             tmpPoints += operationPoints * 35;
         }
-
-        // limit low factory points
+        
         int llfp = 700;
         if (tmpPoints > llfp)
         {
@@ -254,8 +239,6 @@ public static int getAdvantagePoints(Race race)
         {
             points -= 175;
         }
-
-        // mines
         productionPoints = 10 - race.getMineOutput();
         costPoints = 3 - race.getMineCost();
         operationPoints = 10 - race.getNumMines();
@@ -290,15 +273,13 @@ public static int getAdvantagePoints(Race race)
 
         points += tmpPoints;
     }
-
-    // prt and lrt point costs
+    
     points += prtPointCost[race.getPRT()];
 
     // too many lrts
     int badLRTs = 0;
     int goodLRTs = 0;
-
-    // figure out how many bad vs good lrts we have.
+        
     foreach (LRT lrt in race.getLrts())
     {
         if (lrtPointCost[lrt] >= 0)
@@ -324,8 +305,7 @@ public static int getAdvantagePoints(Race race)
     {
         points -= (goodLRTs - badLRTs - 3) * 40;
     }
-
-    // No Advanced scanners is penalized in some races
+    
     if (race.getLrts().Contains(LRT.NAS))
     {
         if (race.getPRT() == PRT.PP)
@@ -341,10 +321,7 @@ public static int getAdvantagePoints(Race race)
             points -= 40;
         }
     }
-
-    // Techs
-    //
-    // Figure out the total number of Extra's, offset by the number of Less's 
+    
     int techcosts = 0;
     for (int i = 0; i < 6; i++)
     {
@@ -358,24 +335,20 @@ public static int getAdvantagePoints(Race race)
             techcosts++;
         }
     }
-
-    // if we have more less's then extra's, penalize the race
     if (techcosts > 0)
     {
         points -= (techcosts * techcosts) * 130;
         if (techcosts >= 6)
         {
-            points += 1430; // already paid 4680 so true cost is 3250
+            points += 1430;
         }
         else if (techcosts == 5)
         {
-            points += 520; // already paid 3250 so true cost is 2730
+            points += 520;
         }
     }
     else if (techcosts < 0)
     {
-        // if we have more extra's, give the race a bonus that increases as
-        // we have more extra's
         int[] scienceCost = new int[] { 150, 330, 540, 780, 1050, 1380 };
         points += scienceCost[(-techcosts) - 1];
         if (techcosts < -4 && race.getColonistsPerResource() < 1000)
@@ -388,8 +361,7 @@ public static int getAdvantagePoints(Race race)
     {
         points -= 180;
     }
-
-    // ART races get penalized extra for have cheap energy because it gives them such a boost
+    
     if (race.getPRT() == PRT.AR && race.getResearchCost().getEnergy() == ResearchCostLevel.Less)
     {
         points -= 100;
@@ -402,32 +374,23 @@ public static int getAdvantagePoints(Race race)
 /**
  * Compute the hab range advantage points for this race by generating test planets for a variety
  * of ranges and using the habitability of those planets
- * 
- * @return The advantage points for this race's habitability range
  */
-private static long getHabRangePoints()
+private static long getHabRange()
 {
     bool totalTerraforming;
     double temperatureSum, gravitySum;
     long radiationSum, planetDesirability;
     int terraformOffsetSum, tmpHab;
     int[] terraformOffset = new int[3];
-
-    // setup the starting values for each hab type, and the widths
-    // for those
+        
     Hab testHabStart = new Hab();
     Hab testHabWidth = new Hab();
-    //int[] testHabStart = new int[3];
-    //int[] testHabWidth = new int[3];
 
     double points = 0.0;
     totalTerraforming = race.getLrts().Contains(LRT.TT);
 
     terraformOffset[0] = terraformOffset[1] = terraformOffset[2] = 0;
-
-    // set the number of iterations for each hab type.  If we're immune it's just
-    // 1 because all the planets in that range will be the same.  Otherwise we loop
-    // over the entire hab range in 11 equal divisions (i.e. for Humanoids grav would be 15, 22, 29, etc. all the way to 85)
+        
     if (race.isImmuneGrav())
     {
         numIterationsGrav = 1;
@@ -452,12 +415,6 @@ private static long getHabRangePoints()
     {
         numIterationsRad = 11;
     }
-
-    // We go through 3 main iterations.  During each the habitability of the test planet
-    // varies between the low and high of the hab range for each hab type.  So for a humanoid
-    // it goes (15, 15, 15), (15, 15, 22), (15, 15, 29), etc.   Until it's (85, 85, 85)
-    // During the various loops the TTCorrectionFactor changes to account for the race's ability
-    // to terrform.
     for (int loopIndex = 0; loopIndex < 3; loopIndex++)
     {
 
@@ -469,12 +426,9 @@ private static long getHabRangePoints()
         else
             TTCorrectionFactor = totalTerraforming ? 17 : 15;
 
-
-        // for each hab type, set up the starts and widths
-        // for this outer loop
+        
         for (int habType = 0; habType < 3; habType++)
         {
-            // if we're immune, just make the hab values some middle value
             if (race.isImmune(habType))
             {
                 testHabStart.setAtIndex(habType, 50);
@@ -483,43 +437,33 @@ private static long getHabRangePoints()
             }
             else
             {
-                // start at the minimum hab range
                 testHabStart.setAtIndex(habType, race.getHabLow().getAtIndex(habType) - TTCorrectionFactor);
-
-                // don't go below 0, that doesnt' make sense for a hab range
+                    
                 if (testHabStart.getAtIndex(habType) < 0)
                 {
                     testHabStart.setAtIndex(habType, 0);
                 }
-
-                // get the high range for this hab type
+                
                 tmpHab = race.getHabHigh().getAtIndex(habType) + TTCorrectionFactor;
-
-                // don't go over 100, that doesn't make sense
+                    
                 if (tmpHab > 100)
                     tmpHab = 100;
-
-                // figure out the width for this hab type's starting range
+                
                 testHabWidth.setAtIndex(habType, tmpHab - testHabStart.getAtIndex(habType));
             }
         }
-
-        // 3 nested for loops, one for each hab type.  The number of iterations is 11 for non immune habs, or 1 for immune habs
-        // this starts iterations for the first hab (gravity)
         gravitySum = 0.0;
         for (int iterationGrav = 0; iterationGrav < numIterationsGrav; iterationGrav++)
         {
             tmpHab = getPlanetHabForHabIndex(iterationGrav, 0, loopIndex, numIterationsGrav, testHabStart.getGrav(), testHabWidth.getGrav(), terraformOffset);
             testPlanetHab.setGrav(tmpHab);
-
-            // go through iterations for temperature
+                
             temperatureSum = 0.0;
             for (int iterationTemp = 0; iterationTemp < numIterationsTemp; iterationTemp++)
             {
                 tmpHab = getPlanetHabForHabIndex(iterationTemp, 1, loopIndex, numIterationsTemp, testHabStart.getTemp(), testHabWidth.getTemp(), terraformOffset);
                 testPlanetHab.setTemp(tmpHab);
-
-                // go through iterations for radiation
+                    
                 radiationSum = 0;
                 for (int iterationRad = 0; iterationRad < numIterationsRad; iterationRad++)
                 {
@@ -531,15 +475,12 @@ private static long getHabRangePoints()
                     terraformOffsetSum = terraformOffset[0] + terraformOffset[1] + terraformOffset[2];
                     if (terraformOffsetSum > TTCorrectionFactor)
                     {
-                        // bring the planet desirability down by the difference between the terraformOffsetSum and the TTCorrectionFactor
                         planetDesirability -= terraformOffsetSum - TTCorrectionFactor;
-                        // make sure the planet isn't negative in desirability
                         if (planetDesirability < 0)
                             planetDesirability = 0;
                     }
                     planetDesirability *= planetDesirability;
-
-                    // modify the planetDesirability by some factor based on which main loop we're going through
+                        
                     switch (loopIndex)
                     {
                         case 0:
@@ -555,9 +496,6 @@ private static long getHabRangePoints()
 
                     radiationSum += planetDesirability;
                 }
-
-                // The radiationSum is the sum of the planetDesirability for each iteration in numIterationsRad
-                // if we're immune to radiation it'll be the same very loop, so *= by 11
                 if (!race.isImmuneRad())
                 {
                     radiationSum = (radiationSum * testHabWidth.getRad()) / 100;
@@ -569,9 +507,6 @@ private static long getHabRangePoints()
 
                 temperatureSum += radiationSum;
             }
-
-            // The tempSum is the sum of the radSums
-            // if we're immune to radiation it'll be the same very loop, so *= by 11
             if (!race.isImmuneTemp())
             {
                 temperatureSum = (temperatureSum * testHabWidth.getTemp()) / 100;
@@ -598,27 +533,14 @@ private static long getHabRangePoints()
     return (long)(points / 10.0 + 0.5);
 }
 
-/**
+/*
  * Get the planet hab value (grav, temp or rad) for an iteration of the loop
- * 
- * @param iterIndex The index of the iteration loop (1 through 11 usually)
- * @param habType The index of the loop
- * @param loopIndex The type of hab for the main outer loop
- * @param TTCorrectionFactor The Total Terraforming Correction Factor
- * @param numIterations The numIterations[HabType] for this loop
- * @param testHabStart The testHabStart for the habType
- * @param testHabWidth The testHabWidth for the habType
- * @param terraformOffset The terraformOffset array to set for the habIndex, this happens to account for the race terraforming in the future (I think)
- * @return The Hab value for the test planet, based on the habIndex, habType,
- *         TTCorrectionFactor, etc.
  */
 private static int getPlanetHabForHabIndex(int iterIndex, int habType, int loopIndex, int numIterations, int testHabStart, int testHabWidth,
                                     int[] terraformOffset)
 {
     int tmpHab = 0;
-
-    // on the first iteration just use the testHabStart we already defined
-    // if we're on a subsequent loop move the hab value along the habitable range of this race
+        
     if (iterIndex == 0 || numIterations <= 1)
     {
         tmpHab = testHabStart;
@@ -627,9 +549,7 @@ private static int getPlanetHabForHabIndex(int iterIndex, int habType, int loopI
     {
         tmpHab = (testHabWidth * iterIndex) / (numIterations - 1) + testHabStart;
     }
-
-    // if we on a main loop other than the first one, do some
-    // stuff with the terraforming correction factor
+    
     if (loopIndex != 0 && !race.isImmune(habType))
     {
         int offset = race.getHabCenter(habType) - tmpHab;
@@ -645,9 +565,7 @@ private static int getPlanetHabForHabIndex(int iterIndex, int habType, int loopI
         {
             offset -= TTCorrectionFactor;
         }
-
-        // we set this terraformOffset value for later use
-        // when we do the summing
+        
         terraformOffset[habType] = offset;
         tmpHab = race.getHabCenter(habType) - offset;
     }

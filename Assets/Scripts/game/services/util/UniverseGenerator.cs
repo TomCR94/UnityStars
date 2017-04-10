@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * Utility class used to create a universe with the given game, controller and tech store configuration
+ */
 public class UniverseGenerator: MonoBehaviour {
 
     public GameObject basePlanet, baseWormhole, planetParent;
@@ -37,12 +40,6 @@ public class UniverseGenerator: MonoBehaviour {
             if (player.getRace().raceType == Race.RaceType.humanoid)
                 player.getRace().setHumanoid();
 
-            // up the tech level for testing
-            // TODO: Remove this!
-            // player.setTechLevels(new TechLevel(10, 10, 10, 10, 10, 10));
-            // int cost = Consts.techResearchCost[10];
-            // player.setTechLevelsSpent(new TechLevel(cost, cost, cost, cost, cost, cost));
-
             Message.info(player, "Welcome to the universe, go forth and conquer!");
 
             foreach (Planet planet in game.getGame().getPlanets())
@@ -58,8 +55,7 @@ public class UniverseGenerator: MonoBehaviour {
                     break;
                 }
             }
-
-            // create ship designs for the player
+            
             player.getTechs().init(player, techStore);
             foreach (TechHull hull in player.getTechs().getHulls())
             {
@@ -70,13 +66,11 @@ public class UniverseGenerator: MonoBehaviour {
             ShipDesign starbase = shipDesigner.designShip(techStore.getHull("Space Station"), player);
             starbase.computeAggregate(player);
             player.getDesigns().Add(starbase);
-
-            // build fleets for this player
+            
             foreach (ShipDesign design in player.getDesigns())
             {
-
-                // create a new fleet for this design
-                Fleet fleet = fleetController.create(design.getHullName(), player.getHomeworld().getX(), player.getHomeworld().getY(), player);
+                
+                Fleet fleet = fleetController.makeFleet(design.getHullName(), player.getHomeworld().getX(), player.getHomeworld().getY(), player);
                 fleet.addShipStack(design, 1);
                 fleet.addWaypoint(player.getHomeworld().getX(), player.getHomeworld().getY(), 5, WaypointTask.None, player.getHomeworld());
                 fleet.computeAggregate();
@@ -90,7 +84,6 @@ public class UniverseGenerator: MonoBehaviour {
 
                 if (design.getHull().isStarbase())
                 {
-                    // if this is a starbase, add it to the player's homeworld
                     player.getHomeworld().setStarbase(fleet);
                     fleet.setOrbiting(player.getHomeworld());
 
@@ -100,38 +93,20 @@ public class UniverseGenerator: MonoBehaviour {
                     fleet.setFuel(fleet.getAggregate().getFuelCapacity());
                     fleet.setOrbiting(player.getHomeworld());
                 }
-
-                // add this fleet to the various arrays
-                // game.getFleets().put(fleet.getId(), fleet);
                 game.getGame().addFleet(fleet);
                 player.getFleetKnowledges().Add(new FleetKnowledge(fleet));
                 player.setNumFleetsBuilt(player.getNumFleetsBuilt() + 1);
             }
 
         }
-        /*
-         * Not going to start scanning before playing turn
-         * 
-        TurnGenerator tg = new TurnGenerator(game, fleetController, planetController);
-        // scan everything!
-        tg.scan(game);
-
-        // do turn processing
-        tg.processTurns(game);
-
-        */
-        game.getGame().setStatus(GameStatus.WaitingForSubmit);
     }
 
 
     /**
-     * Generate a new universe with planets and all
-     * 
-     * @param game The game to generate planets on
+     * Generate the Planets 
      */
     private void generatePlanets(Game game)
     {
-        //game.getPlanets().Clear();
         int width, height;
         height = Consts.sizeToArea[game.getSize()];
         width = height;
@@ -149,35 +124,32 @@ public class UniverseGenerator: MonoBehaviour {
         for (int i = 0; i < numPlanets; i++)
         {
             Vector2 loc = new Vector2(random.Next(width), random.Next(height));
-
-            // make sure this location is ok
+            
             while (!isValidLocation(loc, planetLocs, Consts.planetMinDistance))
             {
                 loc = new Vector2(random.Next(width), random.Next(height));
             }
-
-            // add a new planet
+            
             planetLocs.Add(loc, true);
 
 
             GameObject go = GameObject.Instantiate(basePlanet,  planetParent.transform);
-            Planet planet = planetController.create(ng.nextName(), (int)loc.x, (int)loc.y);
+            Planet planet = planetController.makePlanet(ng.nextName(), (int)loc.x, (int)loc.y);
             go.GetComponent<PlanetGameObject>().setPlanet(planet);
-            planetController.randomize(go.GetComponent<PlanetGameObject>().getPlanet());
+            planetController.randomise(go.GetComponent<PlanetGameObject>().getPlanet());
             game.addPlanet(go.GetComponent<PlanetGameObject>().getPlanet());
             go.transform.localPosition = new Vector3(go.GetComponent<PlanetGameObject>().getPlanet().getX() - width/2, go.GetComponent<PlanetGameObject>().getPlanet().getY() - height/2);
             go.name = planet.getName();
             go.SetActive(true);
-
-
-           // Debug.Log("Planet: " + planet.getName());
         }
 
     }
 
+    /**
+     * Generate the Wormholes 
+     */
     private void generateWormholes(Game game)
     {
-        //game.getPlanets().Clear();
         int width, height;
         height = Consts.sizeToArea[game.getSize()];
         width = height;
@@ -202,8 +174,7 @@ public class UniverseGenerator: MonoBehaviour {
         for (int i = 0; i < numWormholes; i++)
         {
             Vector2 loc = new Vector2(random.Next(width), random.Next(height));
-
-            // make sure this location is ok
+            
             while (!isValidLocation(loc, planetLocs, Consts.planetMinDistance))
             {
                 loc = new Vector2(random.Next(width), random.Next(height));
@@ -226,11 +197,6 @@ public class UniverseGenerator: MonoBehaviour {
 
     /**
      * Return true if the location is not already in (or close to another planet) planet_locs
-     * 
-     * @param loc The location to check
-     * @param planetLocs The locations of every planet so far
-     * @param offset The offset to check for
-     * @return True if this location (or near it) is not already in use
      */
     private static bool isValidLocation(Vector2 loc, Dictionary<Vector2, bool> planetLocs, int offset)
     {

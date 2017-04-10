@@ -19,6 +19,7 @@ public class Consts {
     public static int startingMines = 10;
     public static int factoryCostGermanium = 4;
     public static Cost defenseCost = new Cost(5, 5, 5, 15);
+    public static Cost terraformCost = new Cost(200, 200, 200, 50);
     public static float lowStartingPopFactor = .7f;
     public static int mineralAlchemyCost = 100;
     public static int mineralAlchemyLRTCost = 25;
@@ -36,15 +37,9 @@ public class Consts {
      * The amount techs cost based on research cost
      */
     public static int[] techResearchCost;
-
-    /**
-     * The size of the universe vs the area of the universe
-     */
+    
     public static Dictionary<Size, int> sizeToArea = new Dictionary<Size, int>();
-
-    /**
-     * The size of the universe vs the density vs num planets
-     */
+    
     public static Dictionary<Size, Dictionary<Density, int>> sizeToDensity = new Dictionary<Size, Dictionary<Density, int>>();
 
     static Consts() {

@@ -26,9 +26,6 @@ public class Game : AbstractStarsObject_NonMono {
     private int height;
 
     [SerializeField]
-    private GameStatus status;
-
-    [SerializeField]
     private List<Player> players = new List<Player>();
 
     override public void prePersist()
@@ -146,16 +143,6 @@ public class Game : AbstractStarsObject_NonMono {
     public int getYear()
     {
         return year;
-    }
-
-    public void setStatus(GameStatus status)
-    {
-        this.status = status;
-    }
-
-    public GameStatus getStatus()
-    {
-        return status;
     }
 
     public void setWidth(int width)

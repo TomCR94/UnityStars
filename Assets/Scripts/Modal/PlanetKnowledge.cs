@@ -8,36 +8,21 @@ public class PlanetKnowledge : AbstractStarsObject_NonMono {
 
     [SerializeField]
     private string planetId;
-
-    /**
-     * The mineral concentration of this planet
-     */
+    
     [SerializeField]
     private Mineral concMinerals = new Mineral();
-
-    /**
-     * The hab of this planet
-     */
+    
     [SerializeField]
     private Hab hab = new Hab();
-
-    /**
-     * The owner of this planet, as far as this player's knowledge is concerned
-     */
+    
     private Player owner;
 
     [SerializeField]
     private string ownerID;
-
-    /**
-     * The population of this planet, or null if uninhabited
-     */
+    
     [SerializeField]
     private int population;
-
-    /**
-     * The year this planet knowledge was reported, or null if NA
-     */
+    
     [SerializeField]
     private int reportYear;
 
@@ -52,12 +37,7 @@ public class PlanetKnowledge : AbstractStarsObject_NonMono {
     {
         this.planetId = planet.getID();
     }
-
-    /**
-     * Discover this planet by syncing up this knowledge with the planet characteristics
-     * 
-     * @param year The year this is discovered
-     */
+    
     public void discover(int year, Planet planet)
     {
         this.reportYear = year;

@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using GameSparks.Api.Messages;
+using GameSparks.Api.Requests;
+using UnityEngine.SceneManagement;
 
 public class TurnGenerator
 {
-    /**
-     * Helper class to represent a scanner for scanning
-     * 
-     */
     private class Scanner
     {
 
@@ -49,94 +49,78 @@ public class TurnGenerator
         this.fleetController = fleetController;
         this.planetController = planetController;
     }
-
-    /**
-     * <pre>
-     *         Generate a turn
-     * 
-     *         Stars! Order of Events 
-     *         
-     *         Scrapping fleets (w/possible tech gain) 
-     *         Waypoint 0 unload tasks 
-     *         Waypoint 0 Colonization/Ground Combat resolution (w/possible tech gain) 
-     *         Waypoint 0 load tasks 
-     *         Other Waypoint 0 tasks * 
-     *         MT moves 
-     *         In-space packets move and decay 
-     *         PP packets (de)terraform 
-     *         Packets cause damage 
-     *         Wormhole entry points jiggle 
-     *         Fleets move (run out of fuel, hit minefields (fields reduce as they are hit), stargate, wormhole travel) 
-     *         Inner Strength colonists grow in fleets 
-     *         Mass Packets still in space and Salvage decay 
-     *         Wormhole exit points jiggle 
-     *         Wormhole endpoints degrade/jump 
-     *         SD Minefields detonate (possibly damaging again fleet that hit minefield during movement) 
-     *         Mining 
-     *         Production (incl. research, packet launch, fleet/starbase construction) 
-     *         SS Spy bonus obtained 
-     *         Population grows/dies 
-     *         Packets that just launched and reach their destination cause damage 
-     *         Random events (comet strikes, etc.) 
-     *         Fleet battles (w/possible tech gain) 
-     *         Meet MT 
-     *         Bombing 
-     *         Waypoint 1 unload tasks 
-     *         Waypoint 1 Colonization/Ground Combat resolution (w/possible tech gain) 
-     *         Waypoint 1 load tasks 
-     *         Mine Laying 
-     *         Fleet Transfer 
-     *         CA Instaforming 
-     *         Mine sweeping 
-     *         Starbase and fleet repair 
-     *         Remote Terraforming
-     * </pre>
+    /*
+     * Add a year and go through each step in generating a turn for that year
      */
     public void generate()
     {
-        // time this logic
 
         game.setYear(game.getYear() + 1);
-
-        // initialize the players to starting turn state
+        
         initPlayers();
 
         performWaypointTasks(0);
-        moveMysteryTrader();
-        movePackets();
         updateWormholeEntryPoints();
         moveFleets();
-        growISFleets();
-        decayPackets();
-        updateWormholeExitPoints();
-        detonateMinefields();
-        mine();
-        produce();
-        ssSpy();
+        minePlanets();
+        buildAndProduce();
         grow();
-        randomEvents();
-        battle();
-        mysteryTrader();
-        bombing();
         performWaypointTasks(0);
-        layMines();
-        transferFleets();
-        terraformCAPlanets();
-        sweepMines();
-        repairFleets();
-        remoteTerraform();
 
         scan(game);
-
-        // do turn processing
-        processTurns(game);
         
-        game.setStatus(GameStatus.WaitingForSubmit);
+        processTurns(game);
+        VictoryCheck(game);
 
     }
 
+    private void VictoryCheck(Game game)
+    {
+        foreach (Player player in game.getPlayers())
+        {
+            if (hasOver75PercentOfPlanets(game, player))
+            {
+                if (SceneManager.GetActiveScene().name == "Multiplayer")
+                    new LogChallengeEventRequest()
+                    .SetChallengeInstanceId(game.getName())
+                    .SetEventKey("Win")
+                    .Send((response) =>
+                    {
+                        if (response.HasErrors)
+                        {
+                        Debug.Log("Failed");
+                        }
+                    });
+            }
+        }
+    }
+
+    private bool hasOver75PercentOfPlanets(Game game, Player player)
+    {
+
+        int starsOwned = 0;
+
+        foreach (Planet planet in game.getPlanets())
+        {
+            if (planet.getOwner().getID() == player.getID())
+            {
+                starsOwned++;
+            }
+        }
+
+        int percentage = (starsOwned * 100)
+                       / game.getPlanets().Count;
+
+        if (percentage >= 75)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     /**
-     * Initialize the players to turn start values
+     * init players to turn start values
      */
     private void initPlayers()
     {
@@ -148,26 +132,27 @@ public class TurnGenerator
         }
     }
 
-    /**
-     * Perform any waypoint tasks, including scrapping and tech gain and do it in a specific order
-     * <ul>
-     * <li>Scrapping fleets (w/possible tech gain)</li>
-     * <li>Waypoint 0 unload tasks</li>
-     * <li>Waypoint 0 Colonization/Ground Combat resolution (w/possible tech gain)</li>
-     * <li>Waypoint 0 load tasks</li>
-     * <li>Other Waypoint 0 tasks</li>
-     * </ul>
+    /*
+     * Perform waypoint tasks in the given order
+     * 
+     * Colonise
+     * Scrap 
+     * Invade
+     * Unload
+     * Bomb
+     * Stabilise
+     * Others
+     * 
      */
     private void performWaypointTasks(int index)
     {
-        List<Fleet> colonizeFleets = new List<Fleet>();
+        List<Fleet> coloniseFleets = new List<Fleet>();
         List<Fleet> scrapFleets = new List<Fleet>();
         List<Fleet> otherFleets = new List<Fleet>();
 
 
         List<Fleet> invadeFleets = new List<Fleet>();
         List<Fleet> unloadCargoFleets = new List<Fleet>();
-        List<Fleet> terraformFleets = new List<Fleet>();
         List<Fleet> bombFleets = new List<Fleet>();
         List<Fleet> StabilizeFleets = new List<Fleet>();
 
@@ -176,8 +161,8 @@ public class TurnGenerator
             if (fleet.getWaypoints().Count > index)
                 switch (fleet.getWaypoints()[index].getTask())
                 {
-                    case WaypointTask.Colonize:
-                        colonizeFleets.Add(fleet);
+                    case WaypointTask.Colonise:
+                        coloniseFleets.Add(fleet);
                         break;
                     case WaypointTask.ScrapFleet:
                         scrapFleets.Add(fleet);
@@ -187,9 +172,6 @@ public class TurnGenerator
                         break;
                     case WaypointTask.UnloadCargo:
                         unloadCargoFleets.Add(fleet);
-                        break;
-                    case WaypointTask.Terraform:
-                        terraformFleets.Add(fleet);
                         break;
                     case WaypointTask.Bomb:
                         bombFleets.Add(fleet);
@@ -204,44 +186,39 @@ public class TurnGenerator
                 }
         }
 
-        foreach (Fleet fleet in colonizeFleets)
+        foreach (Fleet fleet in coloniseFleets)
         {
-            fleetController.processTask(fleet, fleet.getWaypoints()[index]);
+            fleetController.doTask(fleet, fleet.getWaypoints()[index]);
         }
 
         foreach (Fleet fleet in scrapFleets)
         {
-            fleetController.processTask(fleet, fleet.getWaypoints()[index]);
+            fleetController.doTask(fleet, fleet.getWaypoints()[index]);
         }
 
         foreach (Fleet fleet in invadeFleets)
         {
-            fleetController.processTask(fleet, fleet.getWaypoints()[index]);
+            fleetController.doTask(fleet, fleet.getWaypoints()[index]);
         }
 
         foreach (Fleet fleet in unloadCargoFleets)
         {
-            fleetController.processTask(fleet, fleet.getWaypoints()[index]);
-        }
-
-        foreach (Fleet fleet in terraformFleets)
-        {
-            fleetController.processTask(fleet, fleet.getWaypoints()[index]);
+            fleetController.doTask(fleet, fleet.getWaypoints()[index]);
         }
 
         foreach (Fleet fleet in bombFleets)
         {
-            fleetController.processTask(fleet, fleet.getWaypoints()[index]);
+            fleetController.doTask(fleet, fleet.getWaypoints()[index]);
         }
 
         foreach (Fleet fleet in StabilizeFleets)
         {
-            fleetController.processTask(fleet, fleet.getWaypoints()[index]);
+            fleetController.doTask(fleet, fleet.getWaypoints()[index]);
         }
 
         foreach (Fleet fleet in otherFleets)
         {
-            fleetController.processTask(fleet, fleet.getWaypoints()[index]);
+            fleetController.doTask(fleet, fleet.getWaypoints()[index]);
         }
 
         if (index != 0)
@@ -263,18 +240,6 @@ public class TurnGenerator
 
     }
 
-    private void moveMysteryTrader()
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    private void movePackets()
-    {
-        // TODO Auto-generated method stub
-
-    }
-
     private void updateWormholeEntryPoints()
     {
         Dictionary<Vector2, bool> planetLocs = new Dictionary<Vector2, bool>();
@@ -287,14 +252,14 @@ public class TurnGenerator
             if (wh.getStabilized())
                 break;
             Debug.Log("Moving Wormhole" + wh.getName());
-            int amountX = Random.Range(-50, 50);
-            int amountY = Random.Range(-50, 50);
+            int amountX = UnityEngine.Random.Range(-50, 50);
+            int amountY = UnityEngine.Random.Range(-50, 50);
 
 
             while (!(wh.getX() + amountX < game.getWidth()) && !( wh.getX() + amountX > 0))
-                amountX = Random.Range(-50, 50);
+                amountX = UnityEngine.Random.Range(-50, 50);
             while (!(wh.getY() + amountY < game.getHeight()) && !(wh.getY() + amountY > 0))
-                amountY = Random.Range(-50, 50);
+                amountY = UnityEngine.Random.Range(-50, 50);
             if (isValidLocation(new Vector2(wh.getX() + amountX, wh.getY() + amountY), planetLocs, Consts.planetMinDistance))
             {
                 wh.setX(wh.getX() + amountX);
@@ -318,13 +283,8 @@ public class TurnGenerator
 
     }
 
-    /**
+    /*
      * Return true if the location is not already in (or close to another planet) planet_locs
-     * 
-     * @param loc The location to check
-     * @param planetLocs The locations of every planet so far
-     * @param offset The offset to check for
-     * @return True if this location (or near it) is not already in use
      */
     private static bool isValidLocation(Vector2 loc, Dictionary<Vector2, bool> planetLocs, int offset)
     {
@@ -360,50 +320,18 @@ public class TurnGenerator
 
         return true;
     }
-
-    private void growISFleets()
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    private void decayPackets()
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    private void updateWormholeExitPoints()
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    private void detonateMinefields()
-    {
-        // TODO Auto-generated method stub
-
-    }
+    
 
     /**
-     * Mine on any planet, mine with remote miners
+     * Mine on any planet
      */
-    private void mine()
+    private void minePlanets()
     {
-        // generate each planet turn
         foreach (Planet planet in game.getPlanets())
         {
             if (planet.getOwner() != null)
             {
                 planetController.mine(planet);
-            }
-        }
-
-        foreach (Fleet fleet in game.getFleets())
-        {
-            if (!fleet.isScrapped())
-            {
-                // remote mine
             }
         }
     }
@@ -411,41 +339,33 @@ public class TurnGenerator
     /**
      * Build things on the planet, do research, etc.
      */
-    private void produce()
+    private void buildAndProduce()
     {
         Dictionary<Player, int> leftoverResources = new Dictionary<Player, int>();
         foreach (Player player in game.getPlayers())
         {
             leftoverResources.Add(player, 0);
         }
-        // generate each planet turn
         foreach (Planet planet in game.getPlanets())
         {
             if (planet.getOwner() != null)
             {
                 planetController.mine(planet);
-                int leftover = planetController.build(planet) + planet.getResourcesPerYearResearch();
+                int leftover = planetController.buildAndProduce(planet) + planet.getResourcesPerYearResearch();
                 if (leftoverResources.ContainsKey(planet.getOwner()))
                     leftoverResources[planet.getOwner()] = leftoverResources[planet.getOwner()] + leftover;
                 else
                     leftoverResources.Add(planet.getOwner(), leftoverResources[planet.getOwner()] + leftover);
 
-                planetController.grow(planet);
+                planetController.managePopulation(planet);
                 planet.getOwner().discover(game, planet);
             }
         }
-
-        // research for each player
+        
         foreach (Player player in leftoverResources.Keys)
         {
             research(player, leftoverResources[player]);
         }
-    }
-
-    private void ssSpy()
-    {
-        // TODO Auto-generated method stub
-
     }
 
     /**
@@ -458,69 +378,9 @@ public class TurnGenerator
         {
             if (planet.getOwner() != null)
             {
-                planetController.grow(planet);
+                planetController.managePopulation(planet);
             }
         }
-    }
-
-    private void randomEvents()
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    private void battle()
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    private void mysteryTrader()
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    private void bombing()
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    private void layMines()
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    private void transferFleets()
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    private void terraformCAPlanets()
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    private void sweepMines()
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    private void repairFleets()
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    private void remoteTerraform()
-    {
-        // TODO Auto-generated method stub
-
     }
 
     /**
@@ -532,7 +392,7 @@ public class TurnGenerator
         List<Fleet> fleets = new List<Fleet>(game.getFleets());
         foreach (Fleet fleet in fleets)
         {
-            fleetController.move(fleet);
+            fleetController.moveFleetTowards(fleet);
             if (fleet.isScrapped())
             {
                 foreach (Player player in game.getPlayers())
@@ -554,43 +414,33 @@ public class TurnGenerator
 
     /**
      * Do all scan operations for the players
-     * 
-     * @param game The game to do scan operations for
      */
     public void scan(Game game)
     {
         foreach (Player player in game.getPlayers())
         {
-            Debug.Log(player.getName());
-            Debug.Log(player.getTechs().getBestPlanetaryScanner());
             scanPlayer(player);
         }
     }
 
     /**
      * Perform scanning for a player
-     * 
-     * @param player The player to scan for
      */
     private void scanPlayer(Player player)
     {
-
-        // initialize the planetary scanner ranges
+        
         TechPlanetaryScanner planetaryScanner = player.getTechs().getBestPlanetaryScanner();
         int planetScanRange = (int)Mathf.Pow(planetaryScanner.getScanRange(), 2);
         int planetScanRangePen = (int)Mathf.Pow(planetaryScanner.getScanRangePen(), 2);
-
-        // get a list of all the fleets and planets we can discover
+        
         List<Fleet> fleets = new List<Fleet>();
         List<Planet> planets = new List<Planet>();
         List<Scanner> scanners = new List<Scanner>();
-
-        // find all fleets that need to be scanned, or who act as scanners
+        
         foreach (Fleet fleet in game.getFleets())
         {
             if (fleet.getOwner().getID() == player.getID())
             {
-                // this is our fleet, discover it
                 fleet.discover(player, true);
                 if (fleet.canScan())
                 {
@@ -600,13 +450,10 @@ public class TurnGenerator
             }
             else
             {
-                // remove any existing knowledge and add this fleet to the list of unknowns
-                // fleet.getFleetKnowledges().remove(player.getId());
                 fleets.Add(fleet);
             }
         }
-
-        // find all planets that need to be scanned, or who act as scanners
+        
         foreach (Planet planet in game.getPlanets())
         {
             if (planet.getOwner() != null && planet.getOwner().getID() == player.getID())
@@ -622,23 +469,19 @@ public class TurnGenerator
                 planets.Add(planet);
             }
         }
-
-        // scan with each of our scanners
+        
         foreach (Scanner scanner in scanners)
         {
-
-            // scan planets
+            
             int index = 0;
             while (index < planets.Count)
             {
                 Planet planetToScan = planets[index];
-
-                // if this planet to scan is within range, have the owner of 'planet' discover it
+                
                 if (scanner.getMapObject().dist(planetToScan) <= scanner.getScanRangePen())
                 {
                     player.discover(game, planetToScan);
-
-                    // discover any orbiting fleets
+                    
                     foreach (Fleet fleet in planetToScan.getOrbitingFleets())
                     {
                         Debug.Log("Fleet: " + fleet.getName());
@@ -654,14 +497,12 @@ public class TurnGenerator
                 }
                 index++;
             }
-
-            // scan fleets
+            
             index = 0;
             while (index < fleets.Count)
             {
                 Fleet fleetToScan = fleets[index];
-
-                // if this planet to scan is within range, have the owner of 'planet' discover it
+                
                 if (scanner.getMapObject().dist(fleetToScan) <= scanner.getScanRangePen())
                 {
                     fleetToScan.discover(player, true);
@@ -671,14 +512,12 @@ public class TurnGenerator
                 }
                 index++;
             }
-
-            // scan fleets
+            
             index = 0;
             while (index < fleets.Count)
             {
                 Fleet fleetToScan = fleets[index];
-
-                // if this planet to scan is within range, have the owner of 'planet' discover it
+                
                 if (scanner.getMapObject().dist(fleetToScan) <= scanner.getScanRange())
                 {
                     fleetToScan.discover(player, false);
@@ -695,9 +534,6 @@ public class TurnGenerator
 
     /**
      * Apply a given number of resources to research possibly gaining tech levels
-     * 
-     * @param player The player to research
-     * @param resources The resouces to apply
      */
     void research(Player player, int resources)
     {
@@ -706,11 +542,6 @@ public class TurnGenerator
         int nextLevelCost = player.getRace().getResearchCostForLevel(player.getCurrentResearchField(), currentLevel + 1);
         currentSpent += resources;
 
-        // if we spent enough for a new level,
-        // - gain the level
-        // - reset our spent amount for the current level to 0
-        // - set next next research level
-        // - spend any leftovers again on research
         if (currentSpent >= nextLevelCost)
         {
             player.getTechLevels().setLevel(player.getCurrentResearchField(), currentLevel + 1);
@@ -722,7 +553,6 @@ public class TurnGenerator
         }
         else
         {
-            // save back out how much we've spent
             player.getTechLevelsSpent().setLevel(player.getCurrentResearchField(), currentSpent);
         }
 
@@ -730,8 +560,6 @@ public class TurnGenerator
 
     /**
      * Process turns using the turn processors
-     * 
-     * @param game The game to process turns for
      */
     public void processTurns(Game game)
     {
@@ -739,13 +567,12 @@ public class TurnGenerator
         {
             if (player.isAi())
             {
-                Debug.Log("Processing AI turn");
-
                 ScoutTurnProcessor processor = ScoutTurnProcessor.instance;
                 processor.init(player, game);
                 processor.process();
 
-                ColonizerTurnProcessor cProcessor = ColonizerTurnProcessor.instance;
+                //Will only send colony ships to planets with ideal conditions, this can mean few if any in a Tiny & Sparse universe
+                ColoniserTurnProcessor cProcessor = ColoniserTurnProcessor.instance;
                 cProcessor.init(player, game);
                 cProcessor.process();
 

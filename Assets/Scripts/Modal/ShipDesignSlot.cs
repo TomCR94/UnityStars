@@ -5,16 +5,10 @@ using UnityEngine;
 [System.Serializable]
 public class ShipDesignSlot : AbstractStarsObject_NonMono
 {
-
-    /**
-   * This is filled in when a player's ship designs are initialized by a TechStore
-   */
+    
    [SerializeField]
     private TechHullSlot hullSlot;
-
-    /**
-     * This is filled in when a player's ship designs are initialized by a TechStore
-     */
+    
     [SerializeField]
     private TechHullComponent hullComponent;
 

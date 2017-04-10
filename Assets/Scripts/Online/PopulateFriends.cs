@@ -39,16 +39,19 @@ public class PopulateFriends : MonoBehaviour {
             new LogEventRequest_getOnlinePlayers()
                 .Send((response) =>
                 {
-                    Clear();
-                    foreach (GSData player in response.ScriptData.GetGSDataList("players"))
-                        if (player.GetString("id") != GameSparksManager.getInstance().getPlayerID())
-                        {
-                            GameObject go = GameObject.Instantiate(transform.GetChild(0).gameObject, transform);
-                            go.GetComponent<Friend>().friendName = player.GetString("displayName");
-                            go.GetComponent<Friend>().userID = player.GetString("id");
-                            go.SetActive(true);
-                        }
-                    refresh.interactable = true;
+                    if (!response.HasErrors)
+                    {
+                        Clear();
+                        foreach (GSData player in response.ScriptData.GetGSDataList("players"))
+                            if (player.GetString("id") != GameSparksManager.getInstance().getPlayerID())
+                            {
+                                GameObject go = GameObject.Instantiate(transform.GetChild(0).gameObject, transform);
+                                go.GetComponent<Friend>().friendName = player.GetString("displayName");
+                                go.GetComponent<Friend>().userID = player.GetString("id");
+                                go.SetActive(true);
+                            }
+                        refresh.interactable = true;
+                    }
                 });
         }
     }

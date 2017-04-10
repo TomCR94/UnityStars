@@ -4,10 +4,7 @@ using UnityEngine;
 
 [System.Serializable]
 public class ShipDesignAggregate {
-
-    /**
- * The engine used for doing
- */
+    
     [SerializeField]
     TechEngine engine;
     [SerializeField]
@@ -33,7 +30,7 @@ public class ShipDesignAggregate {
     private int scanRangePen;
 
     [SerializeField]
-    private bool colonizer;
+    private bool coloniser;
     [SerializeField]
     private int spaceDock;
 
@@ -147,14 +144,14 @@ public class ShipDesignAggregate {
         this.scanRangePen = scanRangePen;
     }
 
-    public bool isColonizer()
+    public bool isColoniser()
     {
-        return colonizer;
+        return coloniser;
     }
 
-    public void setColonizer(bool colonizer)
+    public void setColoniser(bool coloniser)
     {
-        this.colonizer = colonizer;
+        this.coloniser = coloniser;
     }
 
     public int getSpaceDock()

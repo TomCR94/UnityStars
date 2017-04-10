@@ -3,20 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class WaypointTransportAction : AbstractStarsObject {
-
-    /**
-    * The type this action is for
-    */
+    
     private WaypointTaskTransportType type;
-
-    /**
-     * The action to perform on the type
-     */
+    
     private WaypointTaskTransportAction action;
-
-    /**
-     * The value to transport, if applicable
-     */
+    
     private int value;
 
     public WaypointTransportAction() : base()

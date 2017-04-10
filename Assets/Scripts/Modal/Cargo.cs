@@ -28,17 +28,11 @@ public class Cargo : Mineral {
 
     /**
      * Get the total amount of cargo
-     * @return The total kT of cargo
      */
     public int getTotal()
     {
         return ironium + boranium + germanium + colonists;
     }
-
-    /**
-     * For a planet the total colonists is divided by 100, for cargo terms
-     * @return
-     */
     public int getTotalPlanet()
     {
         return ironium + boranium + germanium + (colonists / 100);

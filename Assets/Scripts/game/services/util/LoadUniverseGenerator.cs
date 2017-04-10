@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
-
+/*
+ * Utility class used to load a universe with the given game, controller and tech store configuration
+ */
 public class LoadUniverseGenerator : MonoBehaviour
 {
 
@@ -27,7 +29,7 @@ public class LoadUniverseGenerator : MonoBehaviour
     }
 
     /**
-     * Generate a new universe
+     * Generate the universe
      */
     public void generate()
     {
@@ -39,101 +41,10 @@ public class LoadUniverseGenerator : MonoBehaviour
         generatePlanets(game.getGame());
         generateWormholes(game.getGame());
         generateOrbitingFleets(game.getGame());
-        /*
-        foreach (Player player in game.getPlayers())
-        {
-
-            if (player.getRace().raceType == Race.RaceType.humanoid)
-                player.getRace().setHumanoid();
-
-            // up the tech level for testing
-            // TODO: Remove this!
-            // player.setTechLevels(new TechLevel(10, 10, 10, 10, 10, 10));
-            // int cost = Consts.techResearchCost[10];
-            // player.setTechLevelsSpent(new TechLevel(cost, cost, cost, cost, cost, cost));
-
-            Message.info(player, "Welcome to the universe, go forth and conquer!");
-
-            foreach (Planet planet in game.getPlanets())
-            {
-                if (planet.getOwner() == null)
-                {
-                    planet.makeHomeworld(player, game.getYear());
-                    player.setHomeworld(planet);
-                    planet.addQueueItem(QueueItemType.AutoMine, 5);
-                    planet.addQueueItem(QueueItemType.AutoFactory, 5);
-                    player.getPlanetKnowledges().Add(planet.getID(), new PlanetKnowledge(planet));
-                    Message.homePlanet(player, planet);
-                    break;
-                }
-            }
-
-            // create ship designs for the player
-            player.getTechs().init(player, techStore);
-            foreach (TechHull hull in player.getTechs().getHulls())
-            {
-                ShipDesign design = shipDesigner.designShip(hull, player);
-                design.computeAggregate(player);
-                player.getDesigns().Add(design);
-            }
-            ShipDesign starbase = shipDesigner.designShip(techStore.getHull("Space Station"), player);
-            starbase.computeAggregate(player);
-            player.getDesigns().Add(starbase);
-
-            // build fleets for this player
-            foreach (ShipDesign design in player.getDesigns())
-            {
-
-                // create a new fleet for this design
-                Fleet fleet = fleetController.create(design.getHullName(), player.getHomeworld().getX(), player.getHomeworld().getY(), player);
-                fleet.addShipStack(design, 1);
-                fleet.addWaypoint(player.getHomeworld().getX(), player.getHomeworld().getY(), 5, WaypointTask.None, player.getHomeworld());
-                fleet.computeAggregate();
-
-                GameObject go = GameObject.Instantiate(Resources.Load("Fleet") as GameObject, player.getHomeworld().PlanetGameObject.transform, false);
-                go.transform.position = Vector3.zero;
-                go.GetComponent<FleetGameObject>().setFleet(fleet);
-                go.name = fleet.getName();
-                go.SetActive(true);
-
-
-                if (design.getHull().isStarbase())
-                {
-                    // if this is a starbase, add it to the player's homeworld
-                    player.getHomeworld().setStarbase(fleet);
-                    fleet.setOrbiting(player.getHomeworld());
-
-                }
-                else
-                {
-                    fleet.setFuel(fleet.getAggregate().getFuelCapacity());
-                    fleet.setOrbiting(player.getHomeworld());
-
-                    // set it to orbiting the homeworld
-                    player.getHomeworld().getOrbitingFleets().Add(fleet);
-                }
-
-                // add this fleet to the various arrays
-                // game.getFleets().put(fleet.getId(), fleet);
-                game.addFleet(fleet);
-                player.setNumFleetsBuilt(player.getNumFleetsBuilt() + 1);
-            }
-
-        }
-        /*
-         * Not going to start scanning before playing turn
-         * 
-        TurnGenerator tg = new TurnGenerator(game, fleetController, planetController);
-        // scan everything!
-        tg.scan(game);
-
-        // do turn processing
-        tg.processTurns(game);
-
-        */
-        game.getGame().setStatus(GameStatus.WaitingForSubmit);
     }
-
+    /**
+     * Generate the game from the given save
+     */
     private void generateGame()
     {
         DirectoryInfo dirInf = new DirectoryInfo(GameLocation);
@@ -150,7 +61,9 @@ public class LoadUniverseGenerator : MonoBehaviour
             getPlayerTechs();
         }
     }
-
+    /**
+     * Generate the ship designs from the given save
+     */
     private void getShipDesigns()
     {
         DirectoryInfo dirInf = new DirectoryInfo(GameLocation + "/ShipDesigns/");
@@ -174,7 +87,9 @@ public class LoadUniverseGenerator : MonoBehaviour
             }
         }
     }
-
+    /**
+     * Generate the playertech from the given save
+     */
     private void getPlayerTechs()
     {
         DirectoryInfo dirInf = new DirectoryInfo(GameLocation + "/Techs/");
@@ -200,9 +115,7 @@ public class LoadUniverseGenerator : MonoBehaviour
     }
 
     /**
-     * Generate a new universe with planets and all
-     * 
-     * @param game The game to generate planets on
+     * Generate the planets from the given save
      */
     private void generatePlanets(Game game)
     {
@@ -249,6 +162,9 @@ public class LoadUniverseGenerator : MonoBehaviour
 
     }
 
+    /**
+     * Generate the Wormholes from the given save
+     */
     private void generateWormholes(Game game)
     {
         DirectoryInfo dirInf = new DirectoryInfo(GameLocation + "/Wormholes/");
@@ -271,7 +187,9 @@ public class LoadUniverseGenerator : MonoBehaviour
         }
 
     }
-
+    /**
+     * Generate the Fleets from the given save
+     */
     private void generateOrbitingFleets(Game game)
     {
         DirectoryInfo dirInf = new DirectoryInfo(GameLocation + "/Fleets/");

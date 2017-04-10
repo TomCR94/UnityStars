@@ -48,8 +48,6 @@ public class ProductionQueueItem : AbstractStarsObject_NonMono {
 
     /**
      * Determine the cost of 1 item of this ProductionQueueItem
-     * 
-     * @return The cost
      */
     public Cost getCostOfOne(Race race)
     {
@@ -87,12 +85,16 @@ public class ProductionQueueItem : AbstractStarsObject_NonMono {
             cost = shipDesign.getAggregate().getCost();
         }
 
+        else if (type == QueueItemType.Terraform || type == QueueItemType.AutoTerraform)
+        {
+            cost = Consts.terraformCost;
+        }
+
         return cost;
     }
 
     /**
      * Get the cost of this entire production queue item quanity
-     * @return The cost of the entire quantity of items
      */
     public Cost getCost(Race race)
     {

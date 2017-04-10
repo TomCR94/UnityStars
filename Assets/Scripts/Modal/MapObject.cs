@@ -25,8 +25,6 @@ public class MapObject : AbstractStarsObject_NonMono {
 
     /**
      * Compute the distance between two map objects, without the square root applied
-     * 
-     * @return The distance
      */
     public int dist(MapObject other)
     {
@@ -35,12 +33,6 @@ public class MapObject : AbstractStarsObject_NonMono {
 
     /**
      * Get the distance between two points
-     * 
-     * @param x1
-     * @param y1
-     * @param x2
-     * @param y2
-     * @return The distance as a double
      */
     public static double realDist(int x1, int y1, int x2, int y2)
     {

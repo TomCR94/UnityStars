@@ -5,9 +5,7 @@ using System.Linq;
 using UnityEngine;
 
 /**
- * The current implementation of the TechStore is a staticly created list.  Each tech is created when the class is loaded.
- * This could be switched out for a config file or for the database at a future date.  For now, staticly creating them is simple
- * until the tech tree gets locked down.
+ * Static class to store all the tech used in ship design
  */
 [System.Serializable]
 public class StaticTechStore : MonoBehaviour, TechStore
@@ -72,19 +70,15 @@ public class StaticTechStore : MonoBehaviour, TechStore
 
     public void initShipDesign(ShipDesign design)
     {
-
-        // fill in the TechHull
+        
         TechHull hull = getHull(design.getHullName());
         design.setHull(hull);
         for (int slotIndex = 0; slotIndex < hull.getSlots().Count; slotIndex++)
         {
-            // Fill in the TechHullSlot for this index 
             ShipDesignSlot designSlot = design.getSlots()[slotIndex];
             designSlot.setHullSlot(hull.getSlots()[slotIndex]);
             designSlot.setHullComponent(getHullComponent(designSlot.getHullComponentName()));
         }
-
-        // fill in the aggregate engine
         design.getAggregate().setEngine(getEngine(design.getAggregate().getEngineName()));
     }
 
@@ -278,8 +272,7 @@ public class StaticTechStore : MonoBehaviour, TechStore
         techEngine.getFuelUsage()[8] = 700;
         techEngine.getFuelUsage()[9] = 840;
         techs.Add(techEngine.getName(), techEngine);
-
-        // enigma pulsar        [0,0,0,0,0,65,75,85,95,105],
+        
 
         // Defenses
         Tech tech = new TechDefence("Missile Battery", new Cost(5, 5, 5, 15), new TechRequirements(), 0, TechCategory.PlanetaryDefense).defenseCoverage(199);
@@ -634,8 +627,6 @@ public class StaticTechStore : MonoBehaviour, TechStore
 
     /**
      * Add a new tech to the master list
-     * @param tech The tech to add
-     * @return The tech
      */
     private static TechHullComponent addTechHullComponent(TechHullComponent tech)
     {

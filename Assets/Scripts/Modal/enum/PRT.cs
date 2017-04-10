@@ -1,7 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+/*
+ * Primary Racial Trait
+ */
 public enum PRT
 {
     /**

@@ -47,7 +47,6 @@ public class Wormhole : MapObject {
 
     void generateTwin()
     {
-        //game.getPlanets().Clear();
         int width, height;
         height = Consts.sizeToArea[GameGameObject.instance.game.getSize()];
         width = height;
@@ -61,8 +60,7 @@ public class Wormhole : MapObject {
 
         
         Vector2 loc = new Vector2(random.Next(width), random.Next(height));
-
-        // make sure this location is ok
+        
         while (!isValidLocation(loc, planetLocs, Consts.planetMinDistance))
         {
             loc = new Vector2(random.Next(width), random.Next(height));
@@ -87,11 +85,6 @@ public class Wormhole : MapObject {
 
     /**
      * Return true if the location is not already in (or close to another planet) planet_locs
-     * 
-     * @param loc The location to check
-     * @param planetLocs The locations of every planet so far
-     * @param offset The offset to check for
-     * @return True if this location (or near it) is not already in use
      */
     private static bool isValidLocation(Vector2 loc, Dictionary<Vector2, bool> planetLocs, int offset)
     {

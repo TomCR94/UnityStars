@@ -247,7 +247,7 @@ public class TechHullComponent : Tech {
         this._fuelRegenerationRate = fuelRegenerationRate;
     }
 
-    public bool isColonizationModule()
+    public bool isColonisationModule()
     {
         return _colonizationModule;
     }

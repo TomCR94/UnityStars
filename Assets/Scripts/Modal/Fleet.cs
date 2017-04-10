@@ -80,11 +80,6 @@ public class Fleet : MapObject, CargoHolder {
 
     /**
      * Add a waypoint to this fleet
-     * @param x The x point
-     * @param y The y point
-     * @param speed The speed
-     * @param task The task to perform
-     * @return The newly created Waypoint
      */
     public Waypoint addWaypoint(int x, int y, int speed, WaypointTask task)
     {
@@ -95,12 +90,6 @@ public class Fleet : MapObject, CargoHolder {
 
     /**
      * Add a waypoint to this fleet
-     * @param x The x point
-     * @param y The y point
-     * @param speed The speed
-     * @param task The task to perform
-     * @param target The target for the waypoints
-     * @return The newly created Waypoint
      */
     public Waypoint addWaypoint(int x, int y, int speed, WaypointTask task, MapObject target)
     {
@@ -111,9 +100,6 @@ public class Fleet : MapObject, CargoHolder {
 
     /**
      * Add a ShipStack to the fleet
-     * @param design The design to put in the stack
-     * @param quantity The number of ships in the stack
-     * @return The newly added ShipStack
      */
     public ShipStack addShipStack(ShipDesign design, int quantity)
     {
@@ -139,42 +125,33 @@ public class Fleet : MapObject, CargoHolder {
         aggregate.setShield(0);
         aggregate.setCargoCapacity(0);
         aggregate.setFuelCapacity(0);
-        aggregate.setColonizer(false);
+        aggregate.setColoniser(false);
         aggregate.setCost(new Cost());
         aggregate.setSpaceDock(-1);
 
         foreach (ShipStack stack in shipStacks)
         {
-            // cost
             Cost cost = stack.getDesign().getAggregate().getCost().multiply(stack.getQuantity());
             aggregate.setCost(cost.add(aggregate.getCost()));
-
-            //Weapons
+            
             aggregate.setKillPop(aggregate.getKillPop() + stack.getDesign().getAggregate().getKillPop() * stack.getQuantity());
             aggregate.setMinKill(aggregate.getMinKill() + stack.getDesign().getAggregate().getMinKill() * stack.getQuantity());
-
-            // mass
+            
             aggregate.setMass(aggregate.getMass() + stack.getDesign().getAggregate().getMass() * stack.getQuantity());
-
-            // armor
+            
             aggregate.setArmor(aggregate.getArmor() + stack.getDesign().getAggregate().getArmor() * stack.getQuantity());
-
-            // shield
+            
             aggregate.setShield(aggregate.getShield() + stack.getDesign().getAggregate().getShield() * stack.getQuantity());
-
-            // cargo
+            
             aggregate.setCargoCapacity(aggregate.getCargoCapacity() + stack.getDesign().getAggregate().getCargoCapacity() * stack.getQuantity());
-
-            // fuel
+            
             aggregate.setFuelCapacity(aggregate.getFuelCapacity() + stack.getDesign().getAggregate().getFuelCapacity() * stack.getQuantity());
-
-            // colonization
-            if (stack.getDesign().getAggregate().isColonizer())
+            
+            if (stack.getDesign().getAggregate().isColoniser())
             {
-                aggregate.setColonizer(true);
+                aggregate.setColoniser(true);
             }
-
-            // We should only have one ship stack with spacedock capabilities, so no need to add
+            
             if (stack.getDesign().getAggregate().getSpaceDock() != 0)
             {
                 aggregate.setSpaceDock(stack.getDesign().getAggregate().getSpaceDock());

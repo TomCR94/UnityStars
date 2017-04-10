@@ -4,5 +4,5 @@ using UnityEngine;
 
 public enum QueueItemType
 {
-    Mine, Factory, Defense, Alchemy, AutoMine, AutoFactory, AutoDefense, AutoAlchemy, Fleet, Starbase
+    Mine, Factory, Defense, Alchemy, Terraform, AutoMine, AutoFactory, AutoDefense, AutoAlchemy, AutoTerraform, Fleet, Starbase
 }

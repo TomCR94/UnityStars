@@ -38,8 +38,6 @@ public class TechLevel {
 
     /**
      * Set the tech level to a given value
-     * @param field
-     * @param level
      */
     public void setLevel(TechField field, int level)
     {
@@ -69,9 +67,6 @@ public class TechLevel {
 
     /**
      * Get the value for a given TechField
-     * 
-     * @param field The field to get a value for
-     * @return The value for the field
      */
     public int level(TechField field)
     {
@@ -97,8 +92,6 @@ public class TechLevel {
 
     /**
      * Get the lowest field
-     * 
-     * @return The TechField with the lowest value
      */
     public TechField lowest()
     {
@@ -119,9 +112,6 @@ public class TechLevel {
 
     /**
      * Determine if this TechLevel is lower than another one
-     * 
-     * @param other The other TechLevel
-     * @return true if this level is lower
      */
     public bool lt(TechLevel other)
     {
@@ -137,9 +127,6 @@ public class TechLevel {
 
     /**
      * Determine if this TechLevel is greater than another one
-     * 
-     * @param other The other TechLevel
-     * @return true if this level is greater than
      */
     public bool gt(TechLevel other)
     {
@@ -156,28 +143,6 @@ public class TechLevel {
             }
         }
         return foundGT;
-    }
-
-    /**
-     * Determine if this TechLevel is less than or equal to another one
-     * 
-     * @param other The other TechLevel
-     * @return true if this level is less than or equal
-     */
-    public bool le(TechLevel other)
-    {
-        return !gt(other);
-    }
-
-    /**
-     * Determine if this TechLevel is greater than or equal to another one
-     * 
-     * @param other The other TechLevel
-     * @return true if this level is greater than or equal to
-     */
-    public bool ge(TechLevel other)
-    {
-        return !lt(other);
     }
 
     public bool equals(System.Object obj)
